@@ -1,0 +1,3 @@
+".\Objects\violent v2.0.obj" 
+TO ".\Objects\violent fan-v2.0" 
+PRINT(".\Listings\violent fan-v2.m51") RAMSIZE(256) 

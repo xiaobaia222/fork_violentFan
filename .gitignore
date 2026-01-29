@@ -1,0 +1,15 @@
+*.zip
+*.rar
+
+## ad ignore
+History/
+Project Logs*/
+Project Output*/
+
+
+## kicad ignore
+*.kicad_prl
+*-cache
+*-table
+*.lck
+*kicad-sch-bak

@@ -1,0 +1,848 @@
+C51 COMPILER V9.60.0.0   VIOLENT_V2_0                                                      06/10/2023 13:23:49 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE VIOLENT_V2_0
+OBJECT MODULE PLACED IN .\Objects\violent v2.0.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE violent v2.0.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listi
+                    -ngs\violent v2.0.lst) TABS(2) OBJECT(.\Objects\violent v2.0.obj)
+
+line level    source
+
+   1          #include "STC8Hxxx.h"
+   2          #include "intrins.h"
+   3          //#include "stdio.h"
+   4          
+   5          sbit PWM1   = P1^0;
+   6          sbit PWM1_L = P1^1;
+   7          sbit PWM2   = P1^2;
+   8          sbit PWM2_L = P1^3;
+   9          sbit PWM3   = P1^4;
+  10          sbit PWM3_L = P1^5;
+  11          /*************************************************************************/
+  12          //ÈýÉ«LED£¬¹²Ñô¼«
+  13          #define LED_R P17
+  14          #define LED_G P54
+  15          #define LED_B P16
+  16          /*************************************************************************/
+  17          #define VBUS_SENSE    P30   //³äµçÏß½ÓÈë¼ì²â£¬0£º³äµçÏß½ÓÈë£¬1£º³äµçÏß¶Ï¿ª
+  18          #define POWER_SWITCH  P31   //mos¹ÜÇý¶¯Æ÷µçÔ´¿ª¹Ø£¬0£º¶Ï¿ª£¬1£º½ÓÍ¨
+  19          /*************************************************************************/
+  20          #define KEY1          P37
+  21          #define KEY_SHORTPRESSED  0x01
+  22          #define KEY_LONGPRESSED   0x02
+  23          #define KEY_DOUBLEPRESSED 0x04
+  24          #define KEY_LONGPRESS_TH    100     //°´¼ü³¤°´ãÐÖµ= 100 * 10ms = 1s
+  25          #define KEY_DOUBLEPRESS_TH  15      //°´¼üË«»÷ãÐÖµ= 15 * 10ms = 150ms£¨Á½´Îµ¥»÷°´¼üµÄÊ±¼äÐ¡ÓÚ150ms²ÅÈÏÎªÊÇË«»÷
+             -£©
+  26          unsigned char data key_stage = 0;
+  27          unsigned char data key_pressed_time = 0;
+  28          unsigned char data Trg = 0;
+  29          /*************************************************************************/
+  30          #define BAT_ADC_CH    10    //µçÑ¹¼ì²âÊ¹ÓÃADCÍ¨µÀ10
+  31          #define BAT_AVG_SUM   16    //16¸öÊýÇóÒ»´ÎÆ½¾ù
+  32          #define BAT_LOW_TH    6.4   //µÍÑ¹±£»¤µçÑ¹Öµ£º6.4v
+  33          #define V_DIV_SCALE   (470.0 / (330.0 + 470.0))   //µç³ØµçÑ¹·ÖÑ¹±È
+  34          #define ADC_VREF      5.0   //ADC²Î¿¼µçÑ¹£º5.0v
+  35          #define CODE_TO_V_SCALE (ADC_VREF / 1024.0) / V_DIV_SCALE
+  36          #define BATLOW_RECOVERY_TIME  100
+  37          unsigned int bat_code[BAT_AVG_SUM];
+  38          unsigned char bat_sample_cnt = 0;
+  39          float bat_v;    //µç³ØµçÑ¹£¬µ¥Î»£ºv
+  40          unsigned int batlow_recovery_time = 0;
+  41          unsigned int batlow_cnt = 0;
+  42          /*************************************************************************/
+  43          #define THROTTLE_SUM  4
+  44          unsigned char throttle_index = 0;
+  45          unsigned char code THROTTLE[THROTTLE_SUM] = {0, 60, 150, 250};
+  46          /*************************************************************************/
+  47          #define BEEBEE_VOLUME       40  //ÌáÊ¾ÒôÒôÁ¿(0~250)
+  48          #define PWM_START_VALUE     40  //Æô¶¯ÓÍÃÅ(20~250)
+  49          #define MOTOR_STUCK_TIMEOUT 80  //µç»ú¶Â×ª50*10ms=500msºó£¬¹Ø±Õµçµ÷
+  50          #define MOTOR_RUNTIME_TH    30000   //µç»ú¹¤×÷Ê±¼äãÐÖµ30000*10ms = 5min£¬ÔÚÕâ¸öÊ±¼äÖ®ÄÚÃ»ÓÐÈÎºÎ°´¼ü²Ù×÷½«×Ô¶¯
+             -¹Ø»ú
+  51          #define MOTOR_IDLETIME_TH   3000    //µç»úÏÐÖÃÊ±¼äãÐÖµ3000*10ms = 30sec£¬ ÔÚÕâ¸öÊ±¼äÖ®ÄÚÃ»ÓÐÈÎºÎ°´¼ü²Ù×÷½«×Ô¶
+             -¯¹Ø»ú
+C51 COMPILER V9.60.0.0   VIOLENT_V2_0                                                      06/10/2023 13:23:49 PAGE 2   
+
+  52          unsigned char PWM_value;  //¾ö¶¨PWMÕ¼¿Õ±ÈµÄÖµ
+  53          bit B_start = 0;          //Æô¶¯Ä£Ê½
+  54          bit B_run = 0;            //ÔËÐÐ±êÖ¾
+  55          bit B_Timer1_OF = 0;
+  56          unsigned int data PhaseTimeTmp[8];  //8¸ö»»ÏàÊ±¼ä, Æäsum/16¾ÍÊÇ30¶Èµç½Ç¶È
+  57          unsigned char data TimeIndex = 0;   //»»ÏàÊ±¼ä±£´æË÷Òý
+  58          unsigned int data PhaseTime;        //»»ÏàÊ±¼ä¼ÆÊý
+  59          unsigned char data step = 0;        //»»Ïà²½Öè
+  60          unsigned char data demag_step = 0;      //0:ÒÑ¾­Ïû´Å, 1:ÐèÒªÏû´Å, 2:ÕýÔÚÏû´Å,
+  61          unsigned char data motor_stuck_time = 0;    //¶Â×ª³¬Ê±±äÁ¿
+  62          unsigned int motor_time = 0;            //µç»ú¹¤×÷Ê±¼ä
+  63          /*************************************************************************/
+  64          bit tick_10ms;    //10ms¶¨Ê±±êÖ¾
+  65          
+  66          #define STA_SLEEP   0x01
+  67          #define STA_WAKING  0x02
+  68          #define STA_RUNNING 0x04
+  69          #define STA_BATLOW  0x08
+  70          #define STA_CHARGING  0x10
+  71          unsigned char status = STA_WAKING;    //ÉÏµçºóÄ¬ÈÏ×´Ì¬ÊÇµÍ¹¦ºÄÐÝÃß
+  72          
+  73          void Delay1ms(unsigned char n)    //@35.00MHz
+  74          {
+  75   1        unsigned char i, j;
+  76   1        while(n--)
+  77   1        {
+  78   2          i = 35;
+  79   2          j = 8;
+  80   2          do
+  81   2          {
+  82   3            while (--j);
+  83   3          } while (--i);
+  84   2        }
+  85   1      }
+  86          
+  87          void Delay1us(unsigned char us)   //@35.00MHz
+  88          {
+  89   1        unsigned char i;
+  90   1        do
+  91   1        {
+  92   2          _nop_();
+  93   2          _nop_();
+  94   2          i = 9;
+  95   2          while (--i);
+  96   2        }
+  97   1        while(--us);
+  98   1      }
+  99          void Delay500ns(void)
+ 100          {
+ 101   1        _nop_();
+ 102   1        _nop_();
+ 103   1        _nop_();
+ 104   1        _nop_();
+ 105   1        _nop_();
+ 106   1      }
+ 107          unsigned int  ADC_Get10bitResult(unsigned char channel) //channel = 0~15
+ 108          {
+ 109   1        unsigned char i;
+ 110   1        ADC_CONTR = 0xC0 | channel; 
+ 111   1        //Delay500ns();
+ 112   1        //while((ADC_CONTR & ADC_FLAG) == 0)  ; //µÈ´ýADC½áÊø
+ 113   1        i = 255;
+C51 COMPILER V9.60.0.0   VIOLENT_V2_0                                                      06/10/2023 13:23:49 PAGE 3   
+
+ 114   1        while(i--)
+ 115   1        {
+ 116   2          if((ADC_CONTR & 0x20) != 0)
+ 117   2            break;  //µÈ´ýADC½áÊø
+ 118   2        }
+ 119   1        ADC_CONTR &= ~0x20;
+ 120   1        return  (((unsigned int)ADC_RES << 8) | ADC_RESL);
+ 121   1      }
+ 122          unsigned int bat_average(void)  //È¥µô×î´ó×îÐ¡ÖµºóÇóÆ½¾ù
+ 123          {
+ 124   1        unsigned char i;
+ 125   1        unsigned int min, max;
+ 126   1        unsigned int sum = 0;
+ 127   1        min = max = bat_code[0];
+ 128   1        for(i = 0; i < BAT_AVG_SUM; i++)
+ 129   1        {
+ 130   2          sum += bat_code[i];
+ 131   2          if(bat_code[i] >= max)
+ 132   2            max = bat_code[i];
+ 133   2          if(bat_code[i] <= min)
+ 134   2            min = bat_code[i];
+ 135   2        }
+ 136   1        sum -= (max + min);
+ 137   1        sum /= (BAT_AVG_SUM - 2);
+ 138   1        return sum;
+ 139   1      }
+ 140          void MotorStep(void)  // »»ÏàÐòÁÐº¯Êý
+ 141          {
+ 142   1        switch(step)
+ 143   1        {
+ 144   2          case 0:  // AB  PWM1, PWM2_L=1
+ 145   2            PWMA_ENO = 0x00;  PWM1_L=0; PWM3_L=0;
+ 146   2            Delay500ns();
+ 147   2            PWMA_ENO = 0x01;      // ´ò¿ªAÏàµÄ¸ß¶ËPWM
+ 148   2            PWM2_L = 1;           // ´ò¿ªBÏàµÄµÍ¶Ë
+ 149   2            ADC_CONTR = 0x80+13;  // Ñ¡ÔñP0.2×÷ÎªADCÊäÈë ¼´CÏàµçÑ¹
+ 150   2            CMPCR1 = 0x8c + 0x10; // ±È½ÏÆ÷ÏÂ½µÑØÖÐ¶Ï
+ 151   2            break;
+ 152   2          case 1:  // AC  PWM1, PWM3_L=1
+ 153   2            PWMA_ENO = 0x01;  PWM1_L=0; PWM2_L=0; // ´ò¿ªAÏàµÄ¸ß¶ËPWM
+ 154   2            Delay500ns();
+ 155   2            PWM3_L = 1;           // ´ò¿ªCÏàµÄµÍ¶Ë
+ 156   2            ADC_CONTR = 0x80+12;  // Ñ¡ÔñP0.1×÷ÎªADCÊäÈë ¼´BÏàµçÑ¹
+ 157   2            CMPCR1 = 0x8c + 0x20; // ±È½ÏÆ÷ÉÏÉýÑØÖÐ¶Ï
+ 158   2            break;
+ 159   2          case 2:  // BC  PWM2, PWM3_L=1
+ 160   2            PWMA_ENO = 0x00;  PWM1_L=0; PWM2_L=0;
+ 161   2            Delay500ns();
+ 162   2            PWMA_ENO = 0x04;      // ´ò¿ªBÏàµÄ¸ß¶ËPWM
+ 163   2            PWM3_L = 1;           // ´ò¿ªCÏàµÄµÍ¶Ë
+ 164   2            ADC_CONTR = 0x80+11;  // Ñ¡ÔñP0.0×÷ÎªADCÊäÈë ¼´AÏàµçÑ¹
+ 165   2            CMPCR1 = 0x8c + 0x10; // ±È½ÏÆ÷ÏÂ½µÑØÖÐ¶Ï
+ 166   2            break;
+ 167   2          case 3:  // BA  PWM2, PWM1_L=1
+ 168   2            PWMA_ENO = 0x04;  PWM2_L=0; PWM3_L=0; // ´ò¿ªBÏàµÄ¸ß¶ËPWM
+ 169   2            Delay500ns();
+ 170   2            PWM1_L = 1;           // ´ò¿ªCÏàµÄµÍ¶Ë
+ 171   2            ADC_CONTR = 0x80+13;  // Ñ¡ÔñP0.2×÷ÎªADCÊäÈë ¼´CÏàµçÑ¹
+ 172   2            CMPCR1 = 0x8c + 0x20; // ±È½ÏÆ÷ÉÏÉýÑØÖÐ¶Ï
+ 173   2            break;
+ 174   2          case 4:  // CA  PWM3, PWM1_L=1
+ 175   2            PWMA_ENO = 0x00;  PWM2_L=0; PWM3_L=0;
+C51 COMPILER V9.60.0.0   VIOLENT_V2_0                                                      06/10/2023 13:23:49 PAGE 4   
+
+ 176   2            Delay500ns();
+ 177   2            PWMA_ENO = 0x10;      // ´ò¿ªCÏàµÄ¸ß¶ËPWM
+ 178   2            PWM1_L = 1;           // ´ò¿ªAÏàµÄµÍ¶Ë
+ 179   2            bat_code[bat_sample_cnt] = ADC_Get10bitResult(BAT_ADC_CH);
+ 180   2            ADC_CONTR = 0x80+12;    // Ñ¡ÔñP0.1×÷ÎªADCÊäÈë ¼´BÏàµçÑ¹
+ 181   2            CMPCR1 = 0x8c + 0x10; //±È½ÏÆ÷ÏÂ½µÑØÖÐ¶Ï
+ 182   2            break;
+ 183   2          case 5:  // CB  PWM3, PWM2_L=1
+ 184   2            PWMA_ENO = 0x10;  PWM1_L=0; PWM3_L=0; // ´ò¿ªCÏàµÄ¸ß¶ËPWM
+ 185   2            Delay500ns();
+ 186   2            PWM2_L = 1;           // ´ò¿ªBÏàµÄµÍ¶Ë
+ 187   2            ADC_CONTR = 0x80+11;  // Ñ¡ÔñP0.0×÷ÎªADCÊäÈë ¼´AÏàµçÑ¹
+ 188   2            CMPCR1 = 0x8c + 0x20; // ±È½ÏÆ÷ÉÏÉýÑØÖÐ¶Ï
+ 189   2            break;
+ 190   2          default:
+ 191   2            break;
+ 192   2        }
+ 193   1        if(B_start)
+ 194   1          CMPCR1 = 0x8C;  // Æô¶¯Ê±½ûÖ¹ÏÂ½µÑØºÍÉÏÉýÑØÖÐ¶Ï               
+ 195   1      }                                                                                                         
+             -                                                              
+ 196          void MotorStart(void) // Ç¿ÖÆµç»úÆô¶¯º¯Êý
+ 197          {
+ 198   1        unsigned int timer,i;
+ 199   1        CMPCR1 = 0x8C;  // ¹Ø±È½ÏÆ÷ÖÐ¶Ï
+ 200   1        PWM_value  = 10;  // ³õÊ¼Õ¼¿Õ±È, ¸ù¾Ýµç»úÌØÐÔÉèÖÃ
+ 201   1        PWMA_CCR1L = PWM_value;
+ 202   1        PWMA_CCR2L = PWM_value;
+ 203   1        PWMA_CCR3L = PWM_value;
+ 204   1        step = 0;
+ 205   1        timer = 200;    //·çÉÈµç»úÆô¶¯
+ 206   1        MotorStep();
+ 207   1        Delay1ms(100); //³õÊ¼Î»ÖÃ 
+ 208   1        while(1)
+ 209   1        {
+ 210   2          for(i=0; i<timer; i++)//¸ù¾Ýµç»ú¼ÓËÙÌØÐÔ, ×î¸ß×ªËÙµÈµÈµ÷ÕûÆô¶¯¼ÓËÙËÙ¶È
+ 211   2          {
+ 212   3            Delay1us(100);
+ 213   3          }
+ 214   2          ++step;
+ 215   2          step %= 6;
+ 216   2          PWM_value += 2;
+ 217   2          if(PWM_value > PWM_START_VALUE)
+ 218   2            PWM_value = PWM_START_VALUE;
+ 219   2          PWMA_CCR1L = PWM_value;
+ 220   2          PWMA_CCR2L = PWM_value;
+ 221   2          PWMA_CCR3L = PWM_value;  
+ 222   2          MotorStep();
+ 223   2          timer -= timer/15+1;    
+ 224   2          if(timer < 25)
+ 225   2            return; 
+ 226   2        }
+ 227   1      }
+ 228          void MotorStop(void)
+ 229          {
+ 230   1        B_run = 0;
+ 231   1        throttle_index = 0;
+ 232   1        PWM_value = 0;
+ 233   1        CMPCR1 = 0x8C;  // ¹Ø±È½ÏÆ÷ÖÐ¶Ï
+ 234   1        PWMA_ENO  = 0;  // ¹Ø±ÕPWMÊä³ö
+ 235   1        PWMA_CCR1L = 0;
+ 236   1        PWMA_CCR2L = 0;
+C51 COMPILER V9.60.0.0   VIOLENT_V2_0                                                      06/10/2023 13:23:49 PAGE 5   
+
+ 237   1        PWMA_CCR3L = 0;
+ 238   1        PWM1_L=0;
+ 239   1        PWM2_L=0;
+ 240   1        PWM3_L=0;
+ 241   1      }
+ 242          
+ 243          void KeyScan(void)
+ 244          {
+ 245   1        switch(key_stage)
+ 246   1        {
+ 247   2          case 0:
+ 248   2          {
+ 249   3            if(KEY1 == 0)
+ 250   3              key_stage = 1;
+ 251   3            break;
+ 252   3          }
+ 253   2          case 1:
+ 254   2          {
+ 255   3            if(KEY1 == 0)
+ 256   3            {
+ 257   4              if(++key_pressed_time == KEY_LONGPRESS_TH)
+ 258   4              {
+ 259   5                Trg = KEY_LONGPRESSED;
+ 260   5                key_stage = 3;
+ 261   5              }
+ 262   4            }
+ 263   3            else
+ 264   3            {
+ 265   4              key_stage = 2;
+ 266   4              key_pressed_time = 0;
+ 267   4            }
+ 268   3            break;
+ 269   3          }
+ 270   2          case 2:
+ 271   2          {
+ 272   3            if(KEY1 == 1)
+ 273   3            {
+ 274   4              if(++key_pressed_time == KEY_DOUBLEPRESS_TH)
+ 275   4              {
+ 276   5                Trg = KEY_SHORTPRESSED;
+ 277   5                key_stage = 3;
+ 278   5              }
+ 279   4            }
+ 280   3            else
+ 281   3            {
+ 282   4              Trg = KEY_DOUBLEPRESSED;
+ 283   4              key_stage = 3;
+ 284   4            }
+ 285   3            break;
+ 286   3          }
+ 287   2          case 3:
+ 288   2          {
+ 289   3            if(KEY1 == 1)
+ 290   3            {
+ 291   4              key_stage = 0;
+ 292   4              key_pressed_time = 0;
+ 293   4            }
+ 294   3            break;
+ 295   3          }
+ 296   2          default:
+ 297   2            break;
+ 298   2        }
+C51 COMPILER V9.60.0.0   VIOLENT_V2_0                                                      06/10/2023 13:23:49 PAGE 6   
+
+ 299   1      }
+ 300          void GPIOInit(void)
+ 301          {
+ 302   1        //P17:LED-R, P16:LED-B, P15:LIN3, P14:HIN3
+ 303   1        //P13:LIN2, P12:HIN2, P11:LIN1, P10:HIN1
+ 304   1        P1M0 = 0xFF;  
+ 305   1        P1M1 = 0x00;
+ 306   1        P1 = 0xC0;
+ 307   1        //P37:KEY1, P36:CMP-, P35:ADC13, P34:ADC12
+ 308   1        //P33:ADC11, P32:ADC10, P31:POWER_SWITCH, P30:VBUS_SENSE
+ 309   1        P3M0 = 0x00;  
+ 310   1        P3M1 = 0x7C;
+ 311   1        P3 = 0x81;
+ 312   1        //P54:LED-G
+ 313   1        P5M0 = 0x10;  
+ 314   1        P5M1 = 0x00;
+ 315   1        P5 = 0x10;
+ 316   1      }
+ 317          void ADCInit(void)  //ADC³õÊ¼»¯º¯Êý(ÎªÁËÊ¹ÓÃADCÊäÈë¶Ë×ö±È½ÏÆ÷ÐÅºÅ, Êµ¼ÊÃ»ÓÐÆô¶¯ADC×ª»»)
+ 318          {
+ 319   1        ADC_CONTR = 0x80 + 13;  //ADC PowerOn + channel
+ 320   1        ADCCFG = 0x21;
+ 321   1        P_SW2 |=  0x80; //·ÃÎÊXSFR
+ 322   1        ADCTIM = 0x20 + 20;
+ 323   1      }
+ 324          void PWMInit(void)
+ 325          {
+ 326   1        P_SW2 |= 0x80;    //SFR enable   
+ 327   1      
+ 328   1        PWM1   = 0;
+ 329   1        PWM1_L = 0;
+ 330   1        PWM2   = 0;
+ 331   1        PWM2_L = 0;
+ 332   1        PWM3   = 0;
+ 333   1        PWM3_L = 0;
+ 334   1      
+ 335   1        PWMA_PSCR = 3;    // Ô¤·ÖÆµ¼Ä´æÆ÷, ·ÖÆµ Fck_cnt = Fck_psc/(PSCR[15:0}+1), ±ßÑØ¶ÔÆëPWMÆµÂÊ = SYSclk/((PSCR+1
+             -)*(AAR+1)), ÖÐÑë¶ÔÆëPWMÆµÂÊ = SYSclk/((PSCR+1)*(AAR+1)*2).
+ 336   1        PWMA_DTR  = 24;   // ËÀÇøÊ±¼äÅäÖÃ, n=0~127: DTR= n T,   0x80 ~(0x80+n), n=0~63: DTR=(64+n)*2T,  
+ 337   1                  //        0xc0 ~(0xc0+n), n=0~31: DTR=(32+n)*8T,   0xE0 ~(0xE0+n), n=0~31: DTR=(32+n)*16T,
+ 338   1        PWMA_ARR    = 255;  // ×Ô¶¯ÖØ×°ÔØ¼Ä´æÆ÷,  ¿ØÖÆPWMÖÜÆÚ
+ 339   1        PWMA_CCER1  = 0;
+ 340   1        PWMA_CCER2  = 0;
+ 341   1        PWMA_SR1    = 0;
+ 342   1        PWMA_SR2    = 0;
+ 343   1        PWMA_ENO    = 0;
+ 344   1        PWMA_PS     = 0;
+ 345   1        PWMA_IER    = 0;
+ 346   1      //  PWMA_ISR_En = 0;
+ 347   1      
+ 348   1        PWMA_CCMR1  = 0x68;   // Í¨µÀÄ£Ê½ÅäÖÃ, PWMÄ£Ê½1, Ô¤×°ÔØÔÊÐí
+ 349   1        PWMA_CCR1   = 0;      // ±È½ÏÖµ, ¿ØÖÆÕ¼¿Õ±È(¸ßµçÆ½Ê±ÖÓÊý)
+ 350   1        PWMA_CCER1 |= 0x01;   // ¿ªÆô±È½ÏÊä³ö, ¸ßµçÆ½ÓÐÐ§
+ 351   1        PWMA_PS    |= 0;    // Ñ¡ÔñIO, 0:Ñ¡ÔñP1.0 P1.1, 1:Ñ¡ÔñP2.0 P2.1, 2:Ñ¡ÔñP6.0 P6.1, 
+ 352   1      //  PWMA_ENO   |= 0x01;   // IOÊä³öÔÊÐí,  bit7: ENO4N, bit6: ENO4P, bit5: ENO3N, bit4: ENO3P,  bit3: ENO2N, 
+             - bit2: ENO2P,  bit1: ENO1N,  bit0: ENO1P
+ 353   1      
+ 354   1        PWMA_CCMR2  = 0x68;   // Í¨µÀÄ£Ê½ÅäÖÃ, PWMÄ£Ê½1, Ô¤×°ÔØÔÊÐí
+ 355   1        PWMA_CCR2   = 0;      // ±È½ÏÖµ, ¿ØÖÆÕ¼¿Õ±È(¸ßµçÆ½Ê±ÖÓÊý)
+ 356   1        PWMA_CCER1 |= 0x10;   // ¿ªÆô±È½ÏÊä³ö, ¸ßµçÆ½ÓÐÐ§
+ 357   1        PWMA_PS    |= (0<<2); // Ñ¡ÔñIO, 0:Ñ¡ÔñP1.2 P1.3, 1:Ñ¡ÔñP2.2 P2.3, 2:Ñ¡ÔñP6.2 P6.3, 
+ 358   1      //  PWMA_ENO   |= 0x04;   // IOÊä³öÔÊÐí,  bit7: ENO4N, bit6: ENO4P, bit5: ENO3N, bit4: ENO3P,  bit3: ENO2N, 
+C51 COMPILER V9.60.0.0   VIOLENT_V2_0                                                      06/10/2023 13:23:49 PAGE 7   
+
+             - bit2: ENO2P,  bit1: ENO1N,  bit0: ENO1P
+ 359   1      
+ 360   1        PWMA_CCMR3  = 0x68;   // Í¨µÀÄ£Ê½ÅäÖÃ, PWMÄ£Ê½1, Ô¤×°ÔØÔÊÐí
+ 361   1        PWMA_CCR3   = 0;      // ±È½ÏÖµ, ¿ØÖÆÕ¼¿Õ±È(¸ßµçÆ½Ê±ÖÓÊý)
+ 362   1        PWMA_CCER2 |= 0x01;   // ¿ªÆô±È½ÏÊä³ö, ¸ßµçÆ½ÓÐÐ§
+ 363   1        PWMA_PS    |= (0<<4); // Ñ¡ÔñIO, 0:Ñ¡ÔñP1.4 P1.5, 1:Ñ¡ÔñP2.4 P2.5, 2:Ñ¡ÔñP6.4 P6.5, 
+ 364   1      //  PWMA_ENO   |= 0x10;   // IOÊä³öÔÊÐí,  bit7: ENO4N, bit6: ENO4P, bit5: ENO3N, bit4: ENO3P,  bit3: ENO2N, 
+             - bit2: ENO2P,  bit1: ENO1N,  bit0: ENO1P
+ 365   1      
+ 366   1        PWMA_BKR    = 0x80;   // Ö÷Êä³öÊ¹ÄÜ Ïàµ±ÓÚ×Ü¿ª¹Ø
+ 367   1        PWMA_CR1    = 0x81;   // Ê¹ÄÜ¼ÆÊýÆ÷, ÔÊÐí×Ô¶¯ÖØ×°ÔØ¼Ä´æÆ÷»º³å, ±ßÑØ¶ÔÆëÄ£Ê½, ÏòÉÏ¼ÆÊý,  bit7=1:Ð´×Ô¶¯ÖØ×°Ô
+             -Ø¼Ä´æÆ÷»º³å(±¾ÖÜÆÚ²»»á±»´òÈÅ), =0:Ö±½ÓÐ´×Ô¶¯ÖØ×°ÔØ¼Ä´æÆ÷±¾(ÖÜÆÚ¿ÉÄÜ»áÂÒµô)
+ 368   1        PWMA_EGR    = 0x01;   // ²úÉúÒ»´Î¸üÐÂÊÂ¼þ, Çå³ý¼ÆÊýÆ÷ºÍÓë·ÖÆµ¼ÆÊýÆ÷, ×°ÔØÔ¤·ÖÆµ¼Ä´æÆ÷µÄÖµ
+ 369   1      }
+ 370          void CMPInit(void)  //±È½ÏÆ÷³õÊ¼»¯³ÌÐò
+ 371          {
+ 372   1        CMPCR1 = 0x8C;  // 1000 1100 ´ò¿ª±È½ÏÆ÷£¬P3.6×÷Îª±È½ÏÆ÷µÄ·´ÏàÊäÈë¶Ë£¬ADCÒý½Å×÷ÎªÕýÊäÈë¶Ë 
+ 373   1        CMPCR2 = 60;    // 60¸öÊ±ÖÓÂË²¨£¬±È½Ï½á¹û±ä»¯ÑÓÊ±ÖÜÆÚÊý, 0~63
+ 374   1      }
+ 375          void Timer0Init(void) //Timer0³õÊ¼»¯º¯Êý£¬ÓÃÓÚ¼ì²âµ½¹ýÁãºóÊ²Ã´Ê±ºò»»ÏàÒÔ¼°»»ÏàºóÊ²Ã´Ê±ºò¿ªÊ¼¼ì²â¹ýÁã
+ 376          {
+ 377   1        AUXR &= 0x7F;   //¶¨Ê±Æ÷Ê±ÖÓ12TÄ£Ê½
+ 378   1        TMOD &= 0xF0;   //ÉèÖÃ¶¨Ê±Æ÷Ä£Ê½
+ 379   1        TL0 = 0x00;   //ÉèÖÃ¶¨Ê±³õÊ¼Öµ
+ 380   1        TH0 = 0x00;   //ÉèÖÃ¶¨Ê±³õÊ¼Öµ
+ 381   1        TF0 = 0;      //Çå³ýTF0±êÖ¾
+ 382   1        ET0 = 1;      // ÔÊÐíET0ÖÐ¶Ï
+ 383   1        //TR0 = 1; // ´ò¿ª¶¨Ê±Æ÷0
+ 384   1      }
+ 385          void Timer0Reload(unsigned int n)
+ 386          {
+ 387   1        n = 65535 - n;
+ 388   1        TR0 = 0;
+ 389   1        TH0 = n >> 8;
+ 390   1        TL0 = n;
+ 391   1        TR0 = 1;
+ 392   1      }
+ 393          void Timer1Init(void) //timer1³õÊ¼»¯º¯Êý,ÓÃÓÚ¼ÆËã»»ÏàÖ®¼äµÄÊ±¼ä
+ 394          {
+ 395   1        AUXR &= 0xBF;   //¶¨Ê±Æ÷Ê±ÖÓ12TÄ£Ê½
+ 396   1        TMOD &= 0x0F;   //ÉèÖÃ¶¨Ê±Æ÷Ä£Ê½
+ 397   1        TL1 = 0x00;   //ÉèÖÃ¶¨Ê±³õÊ¼Öµ
+ 398   1        TH1 = 0x00;   //ÉèÖÃ¶¨Ê±³õÊ¼Öµ
+ 399   1        TF1 = 0;    //Çå³ýTF1±êÖ¾
+ 400   1        ET1 = 1;    //¿ªÒç³öÖÐ¶Ï
+ 401   1        TR1 = 1;    //¶¨Ê±Æ÷1¿ªÊ¼¼ÆÊ±
+ 402   1      }
+ 403          unsigned int Timer1GetCnt(void)
+ 404          {
+ 405   1        unsigned int temp;
+ 406   1        TR1 = 0;
+ 407   1        temp = TH1;
+ 408   1        temp <<= 8;
+ 409   1        temp |= TL1;
+ 410   1        TH1 = 0;
+ 411   1        TL1 = 0;
+ 412   1        TR1 = 1;
+ 413   1        return temp;
+ 414   1      }
+ 415          void Timer2Init(void)   //10ºÁÃë@35.00MHz£¬²úÉú10MSÊ±»ùÐÅºÅ
+ 416          {
+ 417   1        AUXR &= 0xFB;   //¶¨Ê±Æ÷Ê±ÖÓ12TÄ£Ê½
+C51 COMPILER V9.60.0.0   VIOLENT_V2_0                                                      06/10/2023 13:23:49 PAGE 8   
+
+ 418   1        T2L = 0x11;     //ÉèÖÃ¶¨Ê±³õÊ¼Öµ
+ 419   1        T2H = 0x8E;     //ÉèÖÃ¶¨Ê±³õÊ¼Öµ
+ 420   1        IE2 |= 0x04;    //Ê¹ÄÜ¶¨Ê±Æ÷ÖÐ¶Ï
+ 421   1        AUXR |= 0x10;   //¶¨Ê±Æ÷2¿ªÊ¼¼ÆÊ±
+ 422   1      }
+ 423          void TM0_Isr(void) interrupt 1  //timer0ÖÐ¶Ïº¯Êý
+ 424          {
+ 425   1        TR0 = 0;  // Timer0Í£Ö¹ÔËÐÐ
+ 426   1        if(demag_step == 1)   //±ê¼ÇÐèÒªÏû´Å. Ã¿´Î¼ì²âµ½¹ý0ÊÂ¼þºóµÚÒ»´ÎÖÐ¶ÏÎª30¶È½ÇÑÓÊ±, ÉèÖÃÏû´ÅÑÓÊ±.
+ 427   1        {
+ 428   2          demag_step = 2;   //1:ÐèÒªÏû´Å, 2:ÕýÔÚÏû´Å, 0ÒÑ¾­Ïû´Å
+ 429   2          if(B_run) //µç»úÕýÔÚÔËÐÐ
+ 430   2          {
+ 431   3            if(++step >= 6)
+ 432   3              step = 0;
+ 433   3            MotorStep();
+ 434   3          }
+ 435   2          //Ïû´ÅÊ±¼ä, »»ÏàºóÏßÈ¦(µç¸Ð)µçÁ÷¼õÐ¡µ½0µÄ¹ý³ÌÖÐ, ³öÏÖ·´µç¶¯ÊÆ, µçÁ÷Ô½´óÏû´ÅÊ±¼äÔ½³¤, ¹ý0¼ì²âÒªÔÚÕâ¸öÊ±¼ä
+             -Ö®ºó
+ 436   2          //100%Õ¼¿Õ±ÈÊ±Ê©¼Ó½ÏÖØ¸ºÔØ, µç»úµçÁ÷ÉÏÉý, ¿ÉÒÔÊ¾²¨Æ÷¿´Ïû´ÅÊ±¼ä.
+ 437   2          //Êµ¼ÊÉÏ, Ö»ÒªÔÚ»»ÏàºóÑÓÊ±¼¸Ê®us²Å¼ì²â¹ýÁã, ¾Í¿ÉÒÔÁË
+ 438   2          Timer0Reload(PhaseTime / 4);
+ 439   2        }
+ 440   1        else if(demag_step == 2)
+ 441   1        {
+ 442   2          demag_step = 0;   //1:ÐèÒªÏû´Å, 2:ÕýÔÚÏû´Å, 0ÒÑ¾­Ïû´Å
+ 443   2        }
+ 444   1      }
+ 445          void TM1_Isr(void) interrupt 3  //timer1ÖÐ¶Ïº¯Êý
+ 446          {
+ 447   1        B_Timer1_OF = 1;  //Òç³ö±êÖ¾
+ 448   1      }
+ 449          void TM2_Isr(void) interrupt 12 //Timer2ÖÐ¶Ïº¯Êý
+ 450          {
+ 451   1        tick_10ms = 1;  //10ms¶¨Ê±±êÖ¾
+ 452   1        KeyScan();
+ 453   1      }
+ 454          void CMP_Isr(void) interrupt 21 //±È½ÏÆ÷ÖÐ¶Ïº¯Êý, ¼ì²âµ½·´µç¶¯ÊÆ¹ý0ÊÂ¼þ
+ 455          {
+ 456   1        unsigned char data i;
+ 457   1        CMPCR1 &= ~0x40;    // ±È½ÏÆ÷ÖÐ¶ÏÐèÈí¼þÇå³ýÖÐ¶Ï±êÖ¾Î»
+ 458   1        if(demag_step == 0) // Ïû´Åºó²Å¼ì²â¹ý0ÊÂ¼þ,   demag_step=1:ÐèÒªÏû´Å, =2:ÕýÔÚÏû´Å, =0ÒÑ¾­Ïû´Å
+ 459   1        {
+ 460   2          PhaseTimeTmp[TimeIndex] = Timer1GetCnt();
+ 461   2          if(B_Timer1_OF)
+ 462   2          {
+ 463   3            B_Timer1_OF = 0;
+ 464   3            PhaseTimeTmp[TimeIndex] = 65535;
+ 465   3          }
+ 466   2          TimeIndex = (++TimeIndex) % 8;    //ÀÛ¼Ó8´Î
+ 467   2          for(PhaseTime=0, i=0; i<8; i++) //Çó8´Î»»ÏàÊ±¼äÀÛ¼ÓºÍ
+ 468   2            PhaseTime += PhaseTimeTmp[i]; 
+ 469   2          PhaseTime = PhaseTime >> 3;     //Çó8´Î»»ÏàÊ±¼äµÄÆ½¾ùÖµ
+ 470   2          if((PhaseTime >= 40) && (PhaseTime <= 8192))
+ 471   2            motor_stuck_time = 0;
+ 472   2          /*  
+ 473   2          if(PhaseTime >= 80)
+ 474   2            PhaseTime -= 40;              //ÐÞÕýÓÉÓÚÂË²¨µçÈÝÒýÆðµÄÖÍºóÊ±¼ä
+ 475   2          else
+ 476   2            PhaseTime  = 20;
+ 477   2          */
+ 478   2          Timer0Reload(PhaseTime / 4);
+C51 COMPILER V9.60.0.0   VIOLENT_V2_0                                                      06/10/2023 13:23:49 PAGE 9   
+
+ 479   2          demag_step = 1;   //1:ÐèÒªÏû´Å, 2:ÕýÔÚÏû´Å, 0ÒÑ¾­Ïû´Å
+ 480   2          //ÏÂÒ»²½£¬ÔÚ¶¨Ê±Æ÷0ÖÐ¶Ïº¯ÊýÖÐ½øÐÐ»»Ïà
+ 481   2        }
+ 482   1      }
+ 483          void INT3_Isr() interrupt 11 //°´¼üÖÐ¶Ï
+ 484          {
+ 485   1      }
+ 486          void INT4_Isr() interrupt 16 //VBUS½ÓÈëÖÐ¶Ï
+ 487          {
+ 488   1        //IAP_CONTR = 0x60;
+ 489   1        status |= STA_CHARGING;
+ 490   1        status |= STA_SLEEP;
+ 491   1        status &= ~STA_RUNNING;
+ 492   1      }
+ 493          void SelfCheckBeeBee(void)
+ 494          {
+ 495   1        PWMA_PSCR = 16;
+ 496   1        
+ 497   1        PWMA_CCR1L = BEEBEE_VOLUME;
+ 498   1        PWM2_L = 1;
+ 499   1        PWMA_ENO = 0x01;
+ 500   1        Delay1ms(250);
+ 501   1        PWMA_CCR1L = 0;
+ 502   1        PWM2_L = 0;
+ 503   1        Delay1ms(50);
+ 504   1        
+ 505   1        PWMA_PSCR = 14;
+ 506   1        
+ 507   1        PWMA_CCR2L = BEEBEE_VOLUME;
+ 508   1        PWM3_L = 1;
+ 509   1        PWMA_ENO = 0x04;
+ 510   1        Delay1ms(250);
+ 511   1        PWMA_CCR2L = 0;
+ 512   1        PWM3_L = 0;
+ 513   1        Delay1ms(50);
+ 514   1        
+ 515   1        PWMA_PSCR = 12;
+ 516   1        
+ 517   1        PWMA_CCR3L = BEEBEE_VOLUME;
+ 518   1        PWM1_L = 1;
+ 519   1        PWMA_ENO = 0x10;
+ 520   1        Delay1ms(250);
+ 521   1        PWMA_CCR3L = 0;
+ 522   1        PWM1_L = 0;
+ 523   1        Delay1ms(50);
+ 524   1        
+ 525   1        PWMA_ENO = 0x00;
+ 526   1        PWMA_PSCR = 3;
+ 527   1      }
+ 528          void BatLowBeeBee()
+ 529          {
+ 530   1        PWMA_PSCR = 16;
+ 531   1        
+ 532   1        PWMA_CCR1L = BEEBEE_VOLUME;
+ 533   1        PWM2_L = 1;
+ 534   1        PWMA_ENO = 0x01;
+ 535   1        Delay1ms(100);
+ 536   1        PWMA_ENO = 0x00;
+ 537   1        Delay1ms(100);
+ 538   1        PWMA_ENO = 0x01;
+ 539   1        Delay1ms(100);
+ 540   1        PWMA_ENO = 0x00;
+C51 COMPILER V9.60.0.0   VIOLENT_V2_0                                                      06/10/2023 13:23:49 PAGE 10  
+
+ 541   1        PWMA_CCR1L = 0;
+ 542   1        PWM2_L = 0;
+ 543   1        
+ 544   1        PWMA_PSCR = 3;
+ 545   1      }
+ 546          void KeyHandle(void)
+ 547          {
+ 548   1        if(Trg == 0)
+ 549   1          return;
+ 550   1        motor_time = 0;
+ 551   1        switch(Trg)
+ 552   1        {
+ 553   2          case KEY_SHORTPRESSED:    //¶Ì°´ÇÐ»»µ²Î»
+ 554   2          {
+ 555   3            if(status & STA_BATLOW) //µç³ØµçÑ¹µÍÊ±£¬½ûÖ¹Æô¶¯·çÉÈ
+ 556   3            {
+ 557   4              BatLowBeeBee();   //²¥·Åµç³ØµçÑ¹µÍµÄÌáÊ¾Òô
+ 558   4            }
+ 559   3            else
+ 560   3            {
+ 561   4              if(++throttle_index == 1)
+ 562   4                B_start = 1;
+ 563   4              if(throttle_index == THROTTLE_SUM)
+ 564   4              {
+ 565   5                throttle_index = 0;
+ 566   5                MotorStop();
+ 567   5              }
+ 568   4            }
+ 569   3            break;
+ 570   3          }
+ 571   2          case KEY_LONGPRESSED:     //³¤°´°´¼ü¹Ø»ú
+ 572   2          {
+ 573   3            MotorStop();
+ 574   3            status &= ~STA_RUNNING;
+ 575   3            status |= STA_SLEEP;
+ 576   3            break;
+ 577   3          }
+ 578   2          case KEY_DOUBLEPRESSED:   //Ë«»÷°´¼üÍ£Ö¹µç»ú
+ 579   2          {
+ 580   3            MotorStop();
+ 581   3            break;
+ 582   3          }
+ 583   2          default:
+ 584   2            break;
+ 585   2        }
+ 586   1        Trg = 0;
+ 587   1      }
+ 588          void LEDControl(void)
+ 589          {
+ 590   1        static unsigned int LED_cnt = 0;
+ 591   1        if(++LED_cnt == 100)
+ 592   1          LED_cnt = 0;
+ 593   1        if(status & STA_BATLOW)
+ 594   1        {
+ 595   2          LED_R = 1;
+ 596   2          LED_G = 1;
+ 597   2          LED_B = 0;
+ 598   2        }
+ 599   1        else if(status & STA_RUNNING)
+ 600   1        {
+ 601   2          if(throttle_index == 0)
+ 602   2          {
+C51 COMPILER V9.60.0.0   VIOLENT_V2_0                                                      06/10/2023 13:23:49 PAGE 11  
+
+ 603   3            LED_R = 0;
+ 604   3            LED_G = 1;
+ 605   3            LED_B = 1;
+ 606   3          }
+ 607   2          else
+ 608   2          {
+ 609   3            if(LED_cnt < (10 + throttle_index * 20))
+ 610   3            {
+ 611   4              LED_R = (LED_cnt / 10) % 2;
+ 612   4            }
+ 613   3            LED_G = 1;
+ 614   3            LED_B = 1;
+ 615   3          }
+ 616   2        }
+ 617   1      }
+ 618          void main(void)
+ 619          {
+ 620   1        unsigned char i;
+ 621   1        GPIOInit();
+ 622   1        PWMInit();
+ 623   1        ADCInit();
+ 624   1        CMPInit();
+ 625   1        //UartInit();
+ 626   1        Timer0Init(); // Timer0³õÊ¼»¯º¯Êý
+ 627   1        Timer1Init(); // Timer1³õÊ¼»¯º¯Êý
+ 628   1        Timer2Init(); // Timer4³õÊ¼»¯º¯Êý
+ 629   1        INTCLKO |= 0x20;  //Ê¹ÄÜINT3ÏÂ½µÑØÖÐ¶Ï
+ 630   1        EA  = 1;          //´ò¿ª×ÜÖÐ¶Ï
+ 631   1        while (1)
+ 632   1        {
+ 633   2          if(status & STA_RUNNING)  //ÔËÐÐ
+ 634   2          {
+ 635   3            if(tick_10ms)   //10msÊ±Ï¶
+ 636   3            {
+ 637   4              tick_10ms = 0;
+ 638   4              if(B_run) //ÕýÔÚÔËÐÐÖÐ
+ 639   4              {
+ 640   5                PWM_value = (unsigned char)(PWM_value * 0.9 + THROTTLE[throttle_index] * 0.1);
+ 641   5                PWMA_CCR1L = PWM_value;
+ 642   5                PWMA_CCR2L = PWM_value;
+ 643   5                PWMA_CCR3L = PWM_value;
+ 644   5                if(++motor_stuck_time == MOTOR_STUCK_TIMEOUT) //¶Â×ª³¬Ê±
+ 645   5                  MotorStop();
+ 646   5              }
+ 647   4              else
+ 648   4              { 
+ 649   5                if(B_start)
+ 650   5                {
+ 651   6                  B_start = 0;
+ 652   6                  for(i=0; i<8; i++)
+ 653   6                    PhaseTimeTmp[i] = 0;
+ 654   6                  MotorStart();   // Æô¶¯µç»ú
+ 655   6                  B_start = 0;
+ 656   6                  demag_step = 0;   // ³õÊ¼½øÈëÊ±
+ 657   6                  CMPCR1 &= ~0x40;  // Çå³ýÖÐ¶Ï±êÖ¾Î»
+ 658   6                  if(step & 0x01)
+ 659   6                    CMPCR1 = 0xAC;    //ÉÏÉýÑØÖÐ¶Ï
+ 660   6                  else
+ 661   6                    CMPCR1 = 0x9C;    //ÏÂ½µÑØÖÐ¶Ï
+ 662   6                  B_run = 1;
+ 663   6                  Delay1ms(250);      //ÑÓÊ±Ò»ÏÂ, ÏÈÆô¶¯ÆðÀ´
+ 664   6                  Delay1ms(250);
+C51 COMPILER V9.60.0.0   VIOLENT_V2_0                                                      06/10/2023 13:23:49 PAGE 12  
+
+ 665   6                  motor_stuck_time = 0;   //Æô¶¯³¬Ê±Ê±¼ä 125*4 = 500ms
+ 666   6                }
+ 667   5                else
+ 668   5                {
+ 669   6                  bat_code[bat_sample_cnt] = ADC_Get10bitResult(BAT_ADC_CH);
+ 670   6                }
+ 671   5              }
+ 672   4              if(++motor_time == (throttle_index==0?MOTOR_IDLETIME_TH:MOTOR_RUNTIME_TH))
+ 673   4              {
+ 674   5                motor_time = 0;
+ 675   5                MotorStop();
+ 676   5                status &= ~STA_RUNNING;
+ 677   5                status |= STA_SLEEP;
+ 678   5              }
+ 679   4              if(++bat_sample_cnt == BAT_AVG_SUM)
+ 680   4              {
+ 681   5                bat_sample_cnt = 0;
+ 682   5                bat_v = bat_average() * CODE_TO_V_SCALE;  //¼ÆËãµÃµ±Ç°µçÑ¹Öµ
+ 683   5                //printf("batv:%.2f\n", bat_v + 0.005);
+ 684   5                if((status & STA_BATLOW) == 0)
+ 685   5                {
+ 686   6                  if(bat_v < BAT_LOW_TH)
+ 687   6                  {
+ 688   7                    if(++batlow_cnt == 64)
+ 689   7                    {
+ 690   8                      batlow_cnt = 0;
+ 691   8                      LED_B = 0;
+ 692   8                      MotorStop();
+ 693   8                      status |= STA_BATLOW;
+ 694   8                      batlow_recovery_time = 0;
+ 695   8                    }
+ 696   7                  }
+ 697   6                  else
+ 698   6                    batlow_cnt = 0;
+ 699   6                }
+ 700   5                else 
+ 701   5                {
+ 702   6                  if(bat_v > BAT_LOW_TH)
+ 703   6                  {
+ 704   7                    if(++batlow_cnt == 32)
+ 705   7                    {
+ 706   8                      batlow_cnt = 0;
+ 707   8                      status &= ~STA_BATLOW;
+ 708   8                    }
+ 709   7                  }
+ 710   6                  else
+ 711   6                    batlow_cnt = 0;
+ 712   6                }
+ 713   5              }
+ 714   4              LEDControl();
+ 715   4            }
+ 716   3            KeyHandle();
+ 717   3          }
+ 718   2          if(status & STA_SLEEP)    //ÐÝÃß
+ 719   2          {
+ 720   3            LED_R = 1;
+ 721   3            LED_G = 1;
+ 722   3            LED_B = 1;
+ 723   3            if(KEY1 == 0)     //Èç¹û°´¼ü»¹Ã»ËÉ¿ª£¬¾ÍÑÓÊ±µÈ´ýËÉ¿ª
+ 724   3            {
+ 725   4              Delay1ms(200);
+ 726   4              Delay1ms(200);
+C51 COMPILER V9.60.0.0   VIOLENT_V2_0                                                      06/10/2023 13:23:49 PAGE 13  
+
+ 727   4              Delay1ms(200);
+ 728   4            }
+ 729   3            POWER_SWITCH = 0; // ¹Ø±ÕMOS¹ÜÇý¶¯¶ËµçÔ´
+ 730   3            INTCLKO &= ~0x40; // ¹Ø±ÕINT4ÏÂ½µÑØÖÐ¶Ï
+ 731   3            ADC_CONTR = 0x00; // ¹Ø±ÕÆ¬ÄÚADCµçÔ´
+ 732   3            CMPCR1 = 0;       // ¹Ø±ÕÆ¬ÄÚ±È½ÏÆ÷
+ 733   3            IE2 &= ~0x04;    //Ê¹ÄÜ¶¨Ê±Æ÷ÖÐ¶Ï
+ 734   3            PCON = 0x02;      // MCU½øÈëµôµçÄ£Ê½
+ 735   3            //´ÓÕâ½øÈëÐÝÃß£¬ÖÐ¶Ï»½ÐÑºóÖ´ÐÐÍêÖÐ¶Ïº¯ÊýºóÒ²»Øµ½Õâ
+ 736   3            _nop_();
+ 737   3            _nop_();
+ 738   3            IAP_CONTR = 0x60;
+ 739   3          }
+ 740   2          if(status & STA_WAKING)   //»½ÐÑ
+ 741   2          {
+ 742   3            unsigned char cnt = 0;
+ 743   3            while(KEY1 == 0)  
+ 744   3            {
+ 745   4              Delay1ms(200);
+ 746   4              LED_G = 0;
+ 747   4              Delay1ms(200);
+ 748   4              LED_G = 1;
+ 749   4              cnt++;
+ 750   4              if(cnt > 3)
+ 751   4                LED_R = 0;
+ 752   4            }
+ 753   3            if(cnt > 3)
+ 754   3            {
+ 755   4              status &= ~STA_SLEEP;
+ 756   4              status |= STA_WAKING;
+ 757   4              if(VBUS_SENSE == 0)   //Èç¹ûÕýÔÚ³äµç£¨³äµçÏß½ÓÈë£©
+ 758   4              {
+ 759   5                POWER_SWITCH = 0;
+ 760   5                status |= STA_CHARGING;
+ 761   5                status |= STA_SLEEP;    //¼ÌÐøÐÝÃß
+ 762   5              }
+ 763   4              else                  //Î´ÔÚ³äµç              
+ 764   4              {   
+ 765   5                CMPCR1 = 0x8C;    //³õÊ¼»¯±È½ÏÆ÷
+ 766   5                ADC_CONTR = 0x80; //¿ªADCµçÔ´
+ 767   5                INTCLKO |= 0x40;  //Ê¹ÄÜINT4ÏÂ½µÑØÖÐ¶Ï
+ 768   5                POWER_SWITCH = 1; //¿ªMOS¹ÜÇý¶¯¶ËµçÔ´
+ 769   5                IE2 |= 0x04;    //Ê¹ÄÜ¶¨Ê±Æ÷ÖÐ¶Ï
+ 770   5                LED_R = 0;
+ 771   5                key_stage = 0;
+ 772   5                key_pressed_time = 0;
+ 773   5                Trg = 0;
+ 774   5                SelfCheckBeeBee();      //µç»ú×Ô¼ì
+ 775   5                status |= STA_RUNNING;  //½øÈëÔËÐÐ×´Ì¬
+ 776   5              }
+ 777   4            }
+ 778   3            else
+ 779   3            {
+ 780   4              status &= ~STA_WAKING;
+ 781   4              status |= STA_SLEEP;
+ 782   4            }
+ 783   3            status &= ~STA_WAKING;//ÍË³ö»½ÐÑ×´Ì¬
+ 784   3          }
+ 785   2        }
+ 786   1      }
+ 787          
+ 788          
+C51 COMPILER V9.60.0.0   VIOLENT_V2_0                                                      06/10/2023 13:23:49 PAGE 14  
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   2152    ----
+   CONSTANT SIZE    =      4    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     73       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      4    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
