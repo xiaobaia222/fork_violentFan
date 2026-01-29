@@ -2,9 +2,177 @@
 	(version 20250114)
 	(generator "eeschema")
 	(generator_version "9.0")
-	(uuid a1ddca43-2887-4568-a6d2-d61b2be010e5)
+	(uuid "a1ddca43-2887-4568-a6d2-d61b2be010e5")
 	(paper "A4")
 	(lib_symbols)
+	(sheet
+		(at 25.4 24.13)
+		(size 38.1 39.37)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "09d934dc-17a1-498d-9cad-8712dee94aeb")
+		(property "Sheetname" "power_chrg"
+			(at 25.4 23.4184 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "power_chrg.kicad_sch"
+			(at 25.4 64.0846 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "fork_Fan"
+				(path "/a1ddca43-2887-4568-a6d2-d61b2be010e5"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 203.2 25.4)
+		(size 38.1 38.1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "ae54bc59-cd75-4f9d-abef-adf4b6dde8cc")
+		(property "Sheetname" "motor_driver"
+			(at 203.2 24.6884 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "motor_driver.kicad_sch"
+			(at 203.2 64.0846 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "fork_Fan"
+				(path "/a1ddca43-2887-4568-a6d2-d61b2be010e5"
+					(page "4")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 38.1 88.9)
+		(size 50.8 50.8)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "cc88b1e3-bad1-4462-9ac8-4681f94aa8cb")
+		(property "Sheetname" "IO_opera"
+			(at 38.1 88.1884 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "IO_opera.kicad_sch"
+			(at 38.1 140.2846 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "fork_Fan"
+				(path "/a1ddca43-2887-4568-a6d2-d61b2be010e5"
+					(page "5")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 114.3 25.4)
+		(size 38.1 38.1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "dd60e015-a4e8-4989-a3cc-d6d3bf10c695")
+		(property "Sheetname" "stc_mcu"
+			(at 114.3 24.6884 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "stc_mcu.kicad_sch"
+			(at 114.3 64.0846 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "fork_Fan"
+				(path "/a1ddca43-2887-4568-a6d2-d61b2be010e5"
+					(page "3")
+				)
+			)
+		)
+	)
 	(sheet_instances
 		(path "/"
 			(page "1")

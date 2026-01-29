@@ -13,3 +13,8 @@ Project Output*/
 *-table
 *.lck
 *kicad-sch-bak
+*-backups/
+
+## keil
+Objects/
+Listings/
