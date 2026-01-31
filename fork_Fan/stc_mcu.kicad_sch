@@ -5,6 +5,206 @@
 	(uuid "54da0328-88bf-4106-a72c-006f11965fed")
 	(paper "A4")
 	(lib_symbols
+		(symbol "Connector_Generic:Conn_01x04"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at 0 5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Conn_01x04"
+				(at 0 -7.62 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Conn_01x04_1_1"
+				(rectangle
+					(start -1.27 3.81)
+					(end 1.27 -6.35)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(rectangle
+					(start -1.27 2.667)
+					(end 0 2.413)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 0.127)
+					(end 0 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -2.413)
+					(end 0 -2.667)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -4.953)
+					(end 0 -5.207)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 2.54 0)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "Pin_2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -2.54 0)
+					(length 3.81)
+					(name "Pin_3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -5.08 0)
+					(length 3.81)
+					(name "Pin_4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Device:C"
 			(pin_numbers
 				(hide yes)
@@ -144,7 +344,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "MCU_STC:STC8G1K08-38I-TSSOP20"
+		(symbol "my_Lib:STC8H1K08-38I-TSSOP20"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
@@ -157,7 +357,7 @@
 					(justify left)
 				)
 			)
-			(property "Value" "STC8G1K08-38I-TSSOP20"
+			(property "Value" "STC8H1K08-38I-TSSOP20"
 				(at 15.24 16.51 0)
 				(effects
 					(font
@@ -211,7 +411,7 @@
 					(hide yes)
 				)
 			)
-			(symbol "STC8G1K08-38I-TSSOP20_0_1"
+			(symbol "STC8H1K08-38I-TSSOP20_0_1"
 				(rectangle
 					(start -40.64 15.24)
 					(end 40.64 -15.24)
@@ -224,11 +424,11 @@
 					)
 				)
 			)
-			(symbol "STC8G1K08-38I-TSSOP20_1_1"
+			(symbol "STC8H1K08-38I-TSSOP20_1_1"
 				(pin bidirectional line
 					(at -43.18 10.16 0)
 					(length 2.54)
-					(name "P1.0/ADC0/RxD2/CCP1"
+					(name "P1.0/ADC0/RxD2/PWM1P"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -246,7 +446,7 @@
 				(pin bidirectional line
 					(at -43.18 7.62 0)
 					(length 2.54)
-					(name "P1.1/ADC1/TxD2/CCP0"
+					(name "P1.1/ADC1/TxD2/PWM1N"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -264,7 +464,7 @@
 				(pin bidirectional line
 					(at -43.18 5.08 0)
 					(length 2.54)
-					(name "P1.2/ADC2/SS/T2/ECI"
+					(name "P1.2/PWM2P/SS/T2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -282,7 +482,7 @@
 				(pin bidirectional line
 					(at -43.18 2.54 0)
 					(length 2.54)
-					(name "P1.3/ADC3/MOSI/T2CLKO"
+					(name "P1.3/PWM2N/MOSI/T2CLKO"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -300,7 +500,7 @@
 				(pin bidirectional line
 					(at -43.18 0 0)
 					(length 2.54)
-					(name "P1.4/ADC4/MISO/SDA"
+					(name "P1.4/PWM3P/MISO/I2CSDA"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -318,7 +518,7 @@
 				(pin bidirectional line
 					(at -43.18 -2.54 0)
 					(length 2.54)
-					(name "P1.5/ADC5/SCLK/SCL"
+					(name "P1.5/PWM3N/SCLK/I2CSCL"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -336,7 +536,7 @@
 				(pin bidirectional line
 					(at -43.18 -5.08 0)
 					(length 2.54)
-					(name "P1.6/ADC6/RxD_3/MCLKO_2/XTALO"
+					(name "P1.6/PWM4P/RxD_3/MCLKO_2/XTALO"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -354,7 +554,7 @@
 				(pin bidirectional line
 					(at -43.18 -7.62 0)
 					(length 2.54)
-					(name "P1.7/ADC7/TxD_3/XTALI"
+					(name "P1.7/PWM4N/PWM5_2/TxD_3/XTALI"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -444,7 +644,7 @@
 				(pin bidirectional line
 					(at 43.18 7.62 180)
 					(length 2.54)
-					(name "INT0/SCLK_4/SCL_4/ADC10/P3.2"
+					(name "PWMET12/PWMETI/I2CSL_4/SCLK_4/INT0/SCL_4/ADC10/P3.2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -462,7 +662,7 @@
 				(pin bidirectional line
 					(at 43.18 5.08 180)
 					(length 2.54)
-					(name "INT1/MISO_4/SDA_4/ADC11/P3.3"
+					(name "PWM7_2/PWM4N_2/I2CSDA_4/MISO_4/INT1/ADC11/P3.3"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -480,7 +680,7 @@
 				(pin bidirectional line
 					(at 43.18 2.54 180)
 					(length 2.54)
-					(name "CMPO/ECI_2/T1CLKO/MOSI_4/T0/ADC12/P3.4"
+					(name "CMPO/PWM8_2/ECI_2/T1CLKO/PWM4P_2/MOSI_4/T0/ADC12/P3.4"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -498,7 +698,7 @@
 				(pin bidirectional line
 					(at 43.18 0 180)
 					(length 2.54)
-					(name "SS_4/CCP0_2/T0CLKO/T1/ADC13/P3.5"
+					(name "PWMFLT2/PWMFLT/SS_4/T0CLKO/T1/ADC13/P3.5"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -516,7 +716,7 @@
 				(pin bidirectional line
 					(at 43.18 -2.54 180)
 					(length 2.54)
-					(name "INT2/CMP-/CCP1_2/RxD_2/ADC14/P3.6"
+					(name "CMP-/RxD_2/ADC14/P3.6"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -534,7 +734,7 @@
 				(pin bidirectional line
 					(at 43.18 -5.08 180)
 					(length 2.54)
-					(name "INT3/CMP+/CCP2/CCP2_2/TxD_2/P3.7"
+					(name "CMP+/TxD_2/INT3/P3.7"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -552,7 +752,7 @@
 				(pin bidirectional line
 					(at 43.18 -10.16 180)
 					(length 2.54)
-					(name "MCLKO/RST/P5.4"
+					(name "MCLKO/NRST/PWM6_2/P5.4"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -570,7 +770,7 @@
 				(pin bidirectional line
 					(at 43.18 -12.7 180)
 					(length 2.54)
-					(name "P5.5"
+					(name "ADC_VRef+"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -857,6 +1057,16 @@
 	)
 	(wire
 		(pts
+			(xy 182.88 55.88) (xy 203.2 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "167af407-b540-48f6-b6f1-bd5785b70b4f")
+	)
+	(wire
+		(pts
 			(xy 139.7 33.02) (xy 139.7 50.8)
 		)
 		(stroke
@@ -864,6 +1074,46 @@
 			(type default)
 		)
 		(uuid "172239e0-9de3-4d93-bb72-ee9000a5d942")
+	)
+	(wire
+		(pts
+			(xy 182.88 78.74) (xy 203.2 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1a0c3501-0f83-4a24-8c57-30c30dae0da3")
+	)
+	(wire
+		(pts
+			(xy 220.98 38.1) (xy 234.95 38.1)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2485b967-acab-4c5c-aded-014ea3952d0c")
+	)
+	(wire
+		(pts
+			(xy 76.2 63.5) (xy 96.52 63.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "39568521-8465-46fa-a853-22f532c9625a")
+	)
+	(wire
+		(pts
+			(xy 182.88 63.5) (xy 203.2 63.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3dfe7f12-144a-49b2-8ac9-69c253a0fc30")
 	)
 	(wire
 		(pts
@@ -877,6 +1127,26 @@
 	)
 	(wire
 		(pts
+			(xy 76.2 73.66) (xy 96.52 73.66)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5119e0a2-d7d6-48e1-8f21-6c67d9c95583")
+	)
+	(wire
+		(pts
+			(xy 182.88 81.28) (xy 203.2 81.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5b20c90f-fd95-49a2-b8f2-4a99cd69be2c")
+	)
+	(wire
+		(pts
 			(xy 149.86 33.02) (xy 149.86 34.29)
 		)
 		(stroke
@@ -887,6 +1157,36 @@
 	)
 	(wire
 		(pts
+			(xy 76.2 58.42) (xy 96.52 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5bebaddd-9f61-478b-a5b9-a46bf46acaa6")
+	)
+	(wire
+		(pts
+			(xy 182.88 68.58) (xy 203.2 68.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5c95b43b-a48f-47ae-ba31-b5d18367ff72")
+	)
+	(wire
+		(pts
+			(xy 76.2 66.04) (xy 96.52 66.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5d436264-6cc9-47a8-b661-151ae8d47ecc")
+	)
+	(wire
+		(pts
 			(xy 161.29 44.45) (xy 161.29 41.91)
 		)
 		(stroke
@@ -894,6 +1194,56 @@
 			(type default)
 		)
 		(uuid "66b4d00e-117b-465f-aa9c-0b5be3021c7d")
+	)
+	(wire
+		(pts
+			(xy 182.88 71.12) (xy 203.2 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6a9f5974-f4f7-4a5f-af2b-02415e58af73")
+	)
+	(wire
+		(pts
+			(xy 182.88 66.04) (xy 203.2 66.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6e43ac63-9d44-4e7a-9a6e-9cfcde688cc7")
+	)
+	(wire
+		(pts
+			(xy 76.2 71.12) (xy 96.52 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6e9d63b8-d6a7-4997-8e65-c724c945e005")
+	)
+	(wire
+		(pts
+			(xy 234.95 40.64) (xy 220.98 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7cfa4bed-fbec-4b53-8825-a7bab5fe9659")
+	)
+	(wire
+		(pts
+			(xy 76.2 68.58) (xy 96.52 68.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "84e52c72-735b-49c0-bda0-c9be2ec17781")
 	)
 	(wire
 		(pts
@@ -917,6 +1267,16 @@
 	)
 	(wire
 		(pts
+			(xy 220.98 33.02) (xy 220.98 38.1)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9989acb8-2c20-4d15-a8ed-e171e37d5d42")
+	)
+	(wire
+		(pts
 			(xy 171.45 33.02) (xy 171.45 34.29)
 		)
 		(stroke
@@ -924,6 +1284,16 @@
 			(type default)
 		)
 		(uuid "9cc6bd7e-f16a-49fa-8a36-b17c7fd9bc95")
+	)
+	(wire
+		(pts
+			(xy 76.2 76.2) (xy 96.52 76.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9ce266e0-4562-4976-87f2-a8ba963b1f1b")
 	)
 	(wire
 		(pts
@@ -957,6 +1327,16 @@
 	)
 	(wire
 		(pts
+			(xy 76.2 60.96) (xy 96.52 60.96)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a934efa3-9657-4129-ac6e-42fb7378d746")
+	)
+	(wire
+		(pts
 			(xy 161.29 33.02) (xy 161.29 34.29)
 		)
 		(stroke
@@ -977,6 +1357,56 @@
 	)
 	(wire
 		(pts
+			(xy 182.88 58.42) (xy 203.2 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c243205b-225f-4b64-bd85-57342786fa31")
+	)
+	(wire
+		(pts
+			(xy 228.6 43.18) (xy 234.95 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cac40f2f-645f-47c2-b4e3-43d009443957")
+	)
+	(wire
+		(pts
+			(xy 220.98 40.64) (xy 220.98 45.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d045af8e-fa20-420a-9ab1-d1ec11f6dc61")
+	)
+	(wire
+		(pts
+			(xy 182.88 60.96) (xy 203.2 60.96)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e33bf3fd-fd6a-4de9-9ab6-9806b5c5addb")
+	)
+	(wire
+		(pts
+			(xy 182.88 73.66) (xy 203.2 73.66)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e7c4c7fb-0517-47b5-af30-e88bf018bd63")
+	)
+	(wire
+		(pts
 			(xy 171.45 44.45) (xy 171.45 45.72)
 		)
 		(stroke
@@ -994,6 +1424,56 @@
 			(type default)
 		)
 		(uuid "fe071e53-9220-40cd-ab9a-84932936b02c")
+	)
+	(wire
+		(pts
+			(xy 228.6 45.72) (xy 234.95 45.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ffc6e426-949c-46d7-a831-51c16cf79f21")
+	)
+	(label "RX"
+		(at 203.2 58.42 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "4e3869c0-9911-4f5b-9236-00ef347ce396")
+	)
+	(label "RX"
+		(at 228.6 45.72 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "7cce2a4d-5c10-4880-bd0b-c9f3fd371a17")
+	)
+	(label "TX"
+		(at 228.6 43.18 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "97adc0db-c0b2-4113-a356-e70ec8bf3815")
+	)
+	(label "TX"
+		(at 203.2 55.88 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "a5fd9bf8-7992-460a-860c-c995365b99aa")
 	)
 	(symbol
 		(lib_id "Device:C")
@@ -1066,6 +1546,82 @@
 		)
 	)
 	(symbol
+		(lib_id "Connector_Generic:Conn_01x04")
+		(at 240.03 40.64 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "2944245d-34a3-4830-879d-4f87f92bb8a3")
+		(property "Reference" "J3"
+			(at 242.57 40.6399 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Conn_01x04"
+			(at 242.57 43.1799 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
+			(at 240.03 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 240.03 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 240.03 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "3"
+			(uuid "92a98309-b06c-4143-8c76-de6f2979fc09")
+		)
+		(pin "1"
+			(uuid "c5991573-3062-4336-9497-4a56d03873d4")
+		)
+		(pin "2"
+			(uuid "280edb29-605c-43b8-85ac-20d78bf1832a")
+		)
+		(pin "4"
+			(uuid "759890ae-4e57-47a2-a03c-692ee73406c9")
+		)
+		(instances
+			(project ""
+				(path "/a1ddca43-2887-4568-a6d2-d61b2be010e5/dd60e015-a4e8-4989-a3cc-d6d3bf10c695"
+					(reference "J3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:VCC")
 		(at 139.7 31.75 0)
 		(unit 1)
@@ -1126,6 +1682,72 @@
 			(project "fork_Fan"
 				(path "/a1ddca43-2887-4568-a6d2-d61b2be010e5/dd60e015-a4e8-4989-a3cc-d6d3bf10c695"
 					(reference "#PWR017")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 220.98 45.72 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "5dadf62c-d9c1-4691-b57e-a740d2a8e483")
+		(property "Reference" "#PWR02"
+			(at 220.98 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 220.98 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 220.98 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 220.98 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 220.98 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "cb2fd3ef-d237-427c-907f-d1e4e75f22ac")
+		)
+		(instances
+			(project "fork_Fan"
+				(path "/a1ddca43-2887-4568-a6d2-d61b2be010e5/dd60e015-a4e8-4989-a3cc-d6d3bf10c695"
+					(reference "#PWR02")
 					(unit 1)
 				)
 			)
@@ -1334,6 +1956,130 @@
 		)
 	)
 	(symbol
+		(lib_id "my_Lib:STC8H1K08-38I-TSSOP20")
+		(at 139.7 68.58 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "ae3034eb-094d-4dca-9a38-bbeabfb43064")
+		(property "Reference" "U3"
+			(at 142.1289 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "STC8H1K08-38I-TSSOP20"
+			(at 142.1289 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm"
+			(at 139.7 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "www.stcmicro.com/datasheet/STC8G-en.pdf"
+			(at 139.7 85.09 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Single Chip MCU based on the 8051 architecture, 8KB Flash, 4KB EEPROM, TSSOP-20"
+			(at 139.7 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "7"
+			(uuid "0571e13e-ca99-401b-abab-a3271c60ebd4")
+		)
+		(pin "17"
+			(uuid "f12e8706-4d19-4562-8e74-a76c79c3cad3")
+		)
+		(pin "19"
+			(uuid "531edf20-d9e6-4bd1-accb-f4cb3059109e")
+		)
+		(pin "11"
+			(uuid "7cd66e7b-2a76-40f2-a37b-4f14c645f7d4")
+		)
+		(pin "13"
+			(uuid "b1a1493c-a647-442d-b837-e1bb5d8f432f")
+		)
+		(pin "14"
+			(uuid "9780a648-b84e-4571-9d0f-96858334d454")
+		)
+		(pin "15"
+			(uuid "8a4d2183-b0b1-4950-94d7-ae0a123976ae")
+		)
+		(pin "2"
+			(uuid "f7058d75-45a9-46f1-97c4-0dbf5e5d3b2b")
+		)
+		(pin "1"
+			(uuid "18fc7e59-4839-4427-960f-21136023c155")
+		)
+		(pin "12"
+			(uuid "fcb6f977-839e-4bff-a222-93547ffd4045")
+		)
+		(pin "3"
+			(uuid "d5fca9f3-d11d-4607-8060-df7aefbe0abc")
+		)
+		(pin "6"
+			(uuid "e1f5f8ff-91c1-46e6-b772-02e099fc2ff5")
+		)
+		(pin "5"
+			(uuid "4b44c7f4-774c-4c7d-bbb0-02191c1b63e3")
+		)
+		(pin "16"
+			(uuid "c14936ea-73af-4f18-b993-6354621356e5")
+		)
+		(pin "10"
+			(uuid "6729e553-8221-4131-97d3-dc3150a7d6db")
+		)
+		(pin "18"
+			(uuid "0320a46a-0377-41a9-a816-02265ce73e21")
+		)
+		(pin "8"
+			(uuid "6b5ce06b-d82a-437a-916d-98118054f156")
+		)
+		(pin "20"
+			(uuid "f33bacaa-328c-490e-a26b-5d2ece59a381")
+		)
+		(pin "4"
+			(uuid "279197b2-41f3-40ab-8641-6c9eb2e43f56")
+		)
+		(pin "9"
+			(uuid "35fa782e-3c8b-466f-b3ef-031ed88896c4")
+		)
+		(instances
+			(project ""
+				(path "/a1ddca43-2887-4568-a6d2-d61b2be010e5/dd60e015-a4e8-4989-a3cc-d6d3bf10c695"
+					(reference "U3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:C")
 		(at 149.86 38.1 0)
 		(unit 1)
@@ -1404,17 +2150,26 @@
 		)
 	)
 	(symbol
-		(lib_id "MCU_STC:STC8G1K08-38I-TSSOP20")
-		(at 139.7 68.58 0)
+		(lib_id "power:VCC")
+		(at 203.2 81.28 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "f1b43f09-2319-40b3-9507-146910bb60a5")
-		(property "Reference" "U3"
-			(at 142.1289 48.26 0)
+		(uuid "cd48de74-69cc-4925-9253-c4f0921ac76c")
+		(property "Reference" "#PWR023"
+			(at 199.39 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+5V"
+			(at 207.01 81.2799 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1422,17 +2177,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "STC8G1K08-38I-TSSOP20"
-			(at 142.1289 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm"
-			(at 139.7 87.63 0)
+		(property "Footprint" ""
+			(at 203.2 81.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1440,8 +2186,8 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "www.stcmicro.com/datasheet/STC8G-en.pdf"
-			(at 139.7 85.09 0)
+		(property "Datasheet" ""
+			(at 203.2 81.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1449,79 +2195,88 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Single Chip MCU based on the 8051 architecture, 8KB Flash, 4KB EEPROM, TSSOP-20"
-			(at 139.7 68.58 0)
+		(property "Description" "Power symbol creates a global label with name \"VCC\""
+			(at 203.2 81.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(hide yes)
 			)
-		)
-		(pin "3"
-			(uuid "c9adc9dd-cb31-41ec-bf53-e135dbfa8fb4")
-		)
-		(pin "5"
-			(uuid "763e9236-671a-4a4a-8291-16cdbaad9bd2")
-		)
-		(pin "11"
-			(uuid "f09e0e80-f64c-433e-bc89-2e6d9c08adb7")
-		)
-		(pin "19"
-			(uuid "41680939-dc06-4a83-965a-9a1e5bd71325")
-		)
-		(pin "20"
-			(uuid "72c106e5-2817-4d50-be09-9e6877ce3fd4")
 		)
 		(pin "1"
-			(uuid "489cdc10-c232-45ae-a555-bce7ef737001")
-		)
-		(pin "2"
-			(uuid "3d21e87c-56d6-4257-84fe-9dff04beaa38")
-		)
-		(pin "4"
-			(uuid "9b938215-3c30-410d-aa06-d36b2d95a0ca")
-		)
-		(pin "6"
-			(uuid "76cd216d-dd10-49f4-a282-7f42edfee893")
-		)
-		(pin "8"
-			(uuid "71efcadd-d80f-407c-97a0-8f87e94b522d")
-		)
-		(pin "10"
-			(uuid "b5fb2e6e-2efc-487c-b708-a2a6d9eb3631")
-		)
-		(pin "16"
-			(uuid "cbfb803e-8b91-491f-8975-60c2722f7cc6")
-		)
-		(pin "18"
-			(uuid "9fd66724-4fcf-41cf-abf4-789c636f3b06")
-		)
-		(pin "17"
-			(uuid "fc34d18a-a5cd-4c25-a1dd-9b0b50537f99")
-		)
-		(pin "13"
-			(uuid "8d1d2aa8-a116-4165-9bed-dfd0fa86166f")
-		)
-		(pin "7"
-			(uuid "444004a8-3d12-46d3-9ea8-a60b3731d3b8")
-		)
-		(pin "14"
-			(uuid "1aa24152-7dd6-4e4c-8375-65df5ceb9e62")
-		)
-		(pin "9"
-			(uuid "09712dbe-734e-446e-bccc-d3ba0cecfbc3")
-		)
-		(pin "12"
-			(uuid "1bee129c-0053-4470-be87-a148584e2c9e")
-		)
-		(pin "15"
-			(uuid "3693cd41-2ae9-405e-baa0-1e92ef16a2a3")
+			(uuid "134dd7d3-d7ce-4dd4-9b8e-2a97813841a3")
 		)
 		(instances
-			(project ""
+			(project "fork_Fan"
 				(path "/a1ddca43-2887-4568-a6d2-d61b2be010e5/dd60e015-a4e8-4989-a3cc-d6d3bf10c695"
-					(reference "U3")
+					(reference "#PWR023")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:VCC")
+		(at 220.98 33.02 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "f079c315-69a9-4428-b78d-0d75cdcb3ac9")
+		(property "Reference" "#PWR021"
+			(at 220.98 36.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+5V"
+			(at 220.98 27.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 220.98 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 220.98 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"VCC\""
+			(at 220.98 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "45fa99cc-90e7-402a-a0b7-56ef23da13a0")
+		)
+		(instances
+			(project "fork_Fan"
+				(path "/a1ddca43-2887-4568-a6d2-d61b2be010e5/dd60e015-a4e8-4989-a3cc-d6d3bf10c695"
+					(reference "#PWR021")
 					(unit 1)
 				)
 			)
