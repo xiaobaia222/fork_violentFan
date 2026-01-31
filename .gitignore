@@ -14,6 +14,9 @@ Project Output*/
 *.lck
 *kicad-sch-bak
 *-backups/
+\#auto_saver*
+_auto_save*
+
 
 ## keil
 Objects/
