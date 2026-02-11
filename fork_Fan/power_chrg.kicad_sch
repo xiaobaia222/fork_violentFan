@@ -2854,6 +2854,16 @@
 			(embedded_fonts no)
 		)
 	)
+	(text "改dcdc\n"
+		(exclude_from_sim no)
+		(at 163.83 34.29 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "d6243716-a069-4617-8f41-4c26bbd3dd55")
+	)
 	(junction
 		(at 171.45 142.24)
 		(diameter 0)

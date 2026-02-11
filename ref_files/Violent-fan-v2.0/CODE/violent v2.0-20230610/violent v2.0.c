@@ -42,7 +42,7 @@ unsigned int batlow_cnt = 0;
 /*************************************************************************/
 #define	THROTTLE_SUM	4
 unsigned char throttle_index = 0;
-unsigned char code THROTTLE[THROTTLE_SUM] = {0, 60, 150, 250};
+unsigned char code THROTTLE[THROTTLE_SUM] = {0, 30, 80, 120};
 /*************************************************************************/
 #define	BEEBEE_VOLUME				40	//提示音音量(0~250)
 #define	PWM_START_VALUE			40	//启动油门(20~250)
