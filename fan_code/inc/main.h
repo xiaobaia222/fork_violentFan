@@ -27,6 +27,26 @@
 // sfr     IRTRIM  =   0x9f;
 sfr     VRTRIM  =   0xa6;
 
+/* 系统状态位 */
+#define STA_SLEEP           0x01
+#define STA_WAKING          0x02
+#define STA_RUNNING         0x04
+#define STA_BATLOW          0x08
+#define STA_CHARGING        0x10
+
+/* 油门档位数 */
+#define THROTTLE_SUM        4
+
+typedef struct {
+    unsigned char bit0 : 1;
+    unsigned char bit1 : 1;
+    unsigned char bit2 : 1;
+    unsigned char bit3 : 1;
+    unsigned char bit4 : 1;
+    unsigned char bit5 : 1;
+    unsigned char bit6 : 1;
+    unsigned char bit7 : 1;
+} __sbit;
 // sfr     P1M1    =   0x91;
 // sfr     P1M0    =   0x92;
 // sfr     P0M1    =   0x93;

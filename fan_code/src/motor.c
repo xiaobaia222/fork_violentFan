@@ -1,6 +1,6 @@
 #include "..\inc\motor.h"
 #include "..\inc\STC8Hxxx.h"
-
+#include "..\inc\main.h"
 
 
 

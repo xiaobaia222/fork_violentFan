@@ -42,12 +42,12 @@ unsigned int batlow_cnt = 0;
 /*************************************************************************/
 #define	THROTTLE_SUM	4
 unsigned char throttle_index = 0;
-unsigned char code THROTTLE[THROTTLE_SUM] = {0, 30, 80, 120};
+unsigned char code THROTTLE[THROTTLE_SUM] = {0, 30, 80, 150};
 /*************************************************************************/
 #define	BEEBEE_VOLUME				40	//提示音音量(0~250)
 #define	PWM_START_VALUE			40	//启动油门(20~250)
 #define	MOTOR_STUCK_TIMEOUT	80  //电机堵转50*10ms=500ms后，关闭电调
-#define	MOTOR_RUNTIME_TH		30000		//电机工作时间阈值30000*10ms = 5min，在这个时间之内没有任何按键操作将自动关机
+#define	MOTOR_RUNTIME_TH		3000000		//电机工作时间阈值30000*10ms = 5min，在这个时间之内没有任何按键操作将自动关机
 #define	MOTOR_IDLETIME_TH		3000		//电机闲置时间阈值3000*10ms = 30sec，	在这个时间之内没有任何按键操作将自动关机
 unsigned char	PWM_value;	//决定PWM占空比的值
 bit	B_start = 0;					//启动模式

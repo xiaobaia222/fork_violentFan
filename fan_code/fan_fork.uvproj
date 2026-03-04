@@ -406,6 +406,11 @@
               <FileType>1</FileType>
               <FilePath>.\src\common.c</FilePath>
             </File>
+            <File>
+              <FileName>key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\key.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

@@ -18,6 +18,7 @@ virtualFolder:
         - path: src/motor.c
         - path: src/led.c
         - path: src/common.c
+        - path: src/key.c
       folders: []
 dependenceList: []
 outDir: build
@@ -29,6 +30,7 @@ targets:
       defineList: []
       incList:
         - ../../../../Keil_v5/C51/INC/STC
+        - inc
       libList: []
     excludeList: []
     toolchain: Keil_C51

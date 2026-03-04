@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/Keil_v5/C51/INC/STC",
+                "C:/Keil_v5/C51/INC"
+            ],
+            "defines": [
+                "__C51__", // 假设你使用的是 Keil 工具链
+                "sbit=__sbit", // 将 sbit 映射为一个宏   
+
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.19041.0",
+            "compilerPath": "C:/Keil_v5/C51/BIN/C51.EXE",
+            "cStandard": "c89",
+            "cppStandard": "c++98",
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}
