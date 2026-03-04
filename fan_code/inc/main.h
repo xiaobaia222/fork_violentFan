@@ -34,9 +34,6 @@ sfr     VRTRIM  =   0xa6;
 #define STA_BATLOW          0x08
 #define STA_CHARGING        0x10
 
-/* 油门档位数 */
-#define THROTTLE_SUM        4
-
 typedef struct {
     unsigned char bit0 : 1;
     unsigned char bit1 : 1;

@@ -43,15 +43,27 @@
   - [x] 比较器初始化 (P3.6 反相输入, 60T 滤波)
   - [x] Timer0 换相/消磁定时 + ISR
   - [x] Timer1 换相间隔测量 + ISR
-  - [x] 比较器 ISR (反电动势过零检测, 8次平均)
+  - [x] 比较器 ISR (反电动势过零检测)
   - [x] 六步换相 motor_step
   - [x] 开环启动 motor_start (渐进加速)
   - [x] 闭环切入 motor_enter_run
   - [x] 停机 motor_stop
   - [x] PWM 设置 motor_set_pwm
+- [x] AM32 风格电机驱动改进
+  - [x] CMP_Isr 时间窗口过滤 (< phase_time/2 丢弃)
+  - [x] CMP_Isr 连续采样验证 (filter_level 次确认)
+  - [x] 自适应 filter_level (10ms tick 中按转速动态调整: 8/4/2)
+  - [x] IIR 滤波替代 8 点平均 (75/25 权重)
+  - [x] 可配置换相提前角 (ADVANCE_LEVEL 0~3, 默认 15°)
+  - [x] 消磁延时独立为 phase_time/4
+  - [x] 过零计数器 zero_crosses
+  - [x] 失同步检测 (CMP_Isr 中 50% 突变 → desync_flag)
+  - [x] timer1_read_cnt 非破坏性读取
 - [x] 主循环集成
   - [x] 10ms 节拍驱动
   - [x] PWM 一阶低通平滑
+  - [x] 占空比变化率钳位 (PWM_RAMP_SLOW=3, PWM_RAMP_FAST=10)
+  - [x] 失同步恢复 (油门减半 + 重置 zero_crosses)
   - [x] 堵转检测与超时停机
   - [x] 运行/闲置超时自动关机
 

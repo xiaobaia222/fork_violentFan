@@ -13,6 +13,8 @@ unsigned char status = 0;
 static bit tick_10ms = 0;
 static unsigned char pwm_value = 0;
 
+static unsigned char last_pwm = 0;
+
 /* 自动关机阈值 */
 #define MOTOR_RUNTIME_TH    30000   // 运行中 30000*10ms = 5min
 #define MOTOR_IDLETIME_TH   3000    // 闲置时 3000*10ms = 30s
@@ -45,10 +47,36 @@ void main()
 
         if (B_run)
         {
-            /* 一阶低通滤波平滑 PWM: new = old*9/10 + target/10 */
+            motor_update_filter();
+
+            /* 失同步恢复: 不停机, 油门减半重新建立同步 */
+            if (desync_flag)
+            {
+                desync_flag = 0;
+                pwm_value = pwm_value >> 1;
+                zero_crosses = 0;
+                motor_stuck_time = 0;
+            }
+
+            /* 一阶低通滤波平滑 PWM */
             pwm_value = (unsigned char)(
                 ((unsigned int)pwm_value * 9 + THROTTLE[throttle_index]) / 10
             );
+
+            /* 占空比变化率钳位 (AM32 防失步核心) */
+            {
+                unsigned char ramp_max;
+                char delta;
+
+                ramp_max = (phase_time > 500) ? PWM_RAMP_SLOW : PWM_RAMP_FAST;
+                delta = (char)pwm_value - (char)last_pwm;
+                if (delta > (char)ramp_max)
+                    pwm_value = last_pwm + ramp_max;
+                else if (delta < -(char)ramp_max)
+                    pwm_value = last_pwm - ramp_max;
+                last_pwm = pwm_value;
+            }
+
             motor_set_pwm(pwm_value);
 
             if (++motor_stuck_time >= MOTOR_STUCK_TIMEOUT)
@@ -66,6 +94,8 @@ void main()
             delay_ms(250);
             delay_ms(250);
             motor_stuck_time = 0;
+            last_pwm = PWM_START_VALUE;
+            pwm_value = PWM_START_VALUE;
         }
 
         /* 自动关机计时 */
