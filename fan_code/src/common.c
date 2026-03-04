@@ -29,3 +29,8 @@ void delay_us(unsigned short us)
 	    while (--i);
    }while(--us);
 }
+
+void delay_500ns(void)
+{
+    _nop_(); _nop_(); _nop_(); _nop_(); _nop_();
+}

@@ -5,22 +5,23 @@
 #include "..\inc\motor.h"
 #include "intrins.h"
 
+/* ======== 全局状态 ======== */
 bit B_start = 0;
 unsigned char throttle_index = 0;
 unsigned int motor_time = 0;
 unsigned char status = 0;
+static bit tick_10ms = 0;
+static unsigned char pwm_value = 0;
+
+/* 自动关机阈值 */
+#define MOTOR_RUNTIME_TH    30000   // 运行中 30000*10ms = 5min
+#define MOTOR_IDLETIME_TH   3000    // 闲置时 3000*10ms = 30s
 
 void init(void);
 void clk_init(void);
 void timer2_init(void);
 void key_handle(void);
 void led_show_throttle(void);
-
-void motor_stop(void)
-{
-    throttle_index = 0;
-    B_start = 0;
-}
 
 void bat_low_beebee(void)
 {
@@ -34,6 +35,49 @@ void main()
     while (1)
     {
         key_handle();
+
+        if (!tick_10ms)
+            continue;
+        tick_10ms = 0;
+
+        if (!(status & STA_RUNNING))
+            continue;
+
+        if (B_run)
+        {
+            /* 一阶低通滤波平滑 PWM: new = old*9/10 + target/10 */
+            pwm_value = (unsigned char)(
+                ((unsigned int)pwm_value * 9 + THROTTLE[throttle_index]) / 10
+            );
+            motor_set_pwm(pwm_value);
+
+            if (++motor_stuck_time >= MOTOR_STUCK_TIMEOUT)
+            {
+                motor_stop();
+                throttle_index = 0;
+            }
+        }
+        else if (B_start)
+        {
+            B_start = 0;
+            motor_start();
+            B_start = 0;
+            motor_enter_run();
+            delay_ms(250);
+            delay_ms(250);
+            motor_stuck_time = 0;
+        }
+
+        /* 自动关机计时 */
+        if (++motor_time >= (throttle_index == 0 ? MOTOR_IDLETIME_TH : MOTOR_RUNTIME_TH))
+        {
+            motor_time = 0;
+            motor_stop();
+            throttle_index = 0;
+            status &= ~STA_RUNNING;
+            status |= STA_SLEEP;
+        }
+
         led_show_throttle();
     }
 }
@@ -67,12 +111,14 @@ void key_handle(void)
 
     case KEY_EVT_LONG:
         motor_stop();
+        throttle_index = 0;
         status &= ~STA_RUNNING;
         status |= STA_SLEEP;
         break;
 
     case KEY_EVT_DOUBLE:
         motor_stop();
+        throttle_index = 0;
         break;
     }
 }
@@ -99,7 +145,9 @@ void init(void)
     clk_init();
     led_init();
     key_init();
+    motor_init();
     timer2_init();
+    P_SW2 |= 0x80;     /* 保持 xdata SFR 访问使能，运行时 PWMA 寄存器需要 */
     EA = 1;
 }
 
@@ -126,5 +174,6 @@ void timer2_init(void)
 
 void TM2_Isr(void) interrupt 12
 {
+    tick_10ms = 1;
     key_scan();
 }

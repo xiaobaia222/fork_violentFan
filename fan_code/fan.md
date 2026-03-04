@@ -30,42 +30,46 @@
 
 - [x] 项目结构搭建，模块化拆分
 - [x] 时钟初始化 (35MHz)
-- [x] 延时函数 (delay_ms, delay_us)
-- [x] LED 驱动 (RGB 初始化、单色/全部开关)
-- [x] 按键模块 (key_scan 状态机 + key_handle 事件处理)
-- [x] Timer2 10ms 中断时基，按键扫描接入主循环
-- [x] LED 指示当前档位 (档1红/档2绿/档3蓝/停止灭)
-
-### 进行中
-
-- [ ] 电机驱动 (motor.c)
-  - [x] PWM 引脚定义
-  - [ ] PWM 外设初始化
-  - [ ] 六步换相 (motor_step)
-  - [ ] 开环启动 (motor_start)
-  - [ ] 停机逻辑 (motor_stop) — 当前为桩函数
+- [x] 延时函数 (delay_ms, delay_us, delay_500ns)
+- [x] LED 驱动 (RGB 推挽输出, 单色/全部开关)
+- [x] 按键模块 (标准6状态消抖状态机, 短按/长按/双击)
+- [x] P3.7 内部上拉使能 (P3PU)
+- [x] Timer2 10ms 中断时基 + tick_10ms 节拍
+- [x] LED 指示档位 (仅状态变化时更新)
+- [x] 电机驱动 (motor.c)
+  - [x] GPIO 初始化 (P1.0~P1.5 推挽, P3.2~P3.6 高阻, POWER_SWITCH)
+  - [x] PWMA 3 通道初始化 (34kHz, 死区24T, 8位分辨率)
+  - [x] ADC 初始化 (为比较器提供正输入)
+  - [x] 比较器初始化 (P3.6 反相输入, 60T 滤波)
+  - [x] Timer0 换相/消磁定时 + ISR
+  - [x] Timer1 换相间隔测量 + ISR
+  - [x] 比较器 ISR (反电动势过零检测, 8次平均)
+  - [x] 六步换相 motor_step
+  - [x] 开环启动 motor_start (渐进加速)
+  - [x] 闭环切入 motor_enter_run
+  - [x] 停机 motor_stop
+  - [x] PWM 设置 motor_set_pwm
+- [x] 主循环集成
+  - [x] 10ms 节拍驱动
+  - [x] PWM 一阶低通平滑
+  - [x] 堵转检测与超时停机
+  - [x] 运行/闲置超时自动关机
 
 ### 待开发
 
-- [ ] 比较器初始化 + 反电动势过零检测中断 (CMP_Isr)
-- [ ] Timer0 换相定时
-- [ ] Timer1 溢出计数
 - [ ] ADC 电池电压检测
-  - [ ] ADC 初始化
   - [ ] 16 点去极值平均
   - [ ] 低压保护阈值 6.4V
+  - [ ] 低压恢复机制
 - [ ] 蜂鸣器模块
   - [ ] 自检蜂鸣 (self_check_beebee)
   - [ ] 低压蜂鸣 (bat_low_beebee) — 当前为桩函数
-- [ ] 主循环状态机
-  - [ ] STA_SLEEP: 低功耗休眠
-  - [ ] STA_WAKING: 长按唤醒
-  - [ ] STA_RUNNING: 正常运行
-  - [ ] STA_BATLOW: 低压保护
+- [ ] 主循环状态机完善
+  - [ ] STA_SLEEP: 低功耗休眠 (PCON 掉电模式)
+  - [ ] STA_WAKING: 长按唤醒流程
   - [ ] STA_CHARGING: 充电模式
-- [ ] 堵转检测与超时停机
-- [ ] 运行/闲置超时自动关机
 - [ ] VBUS 充电线接入检测 (INT4 中断)
+- [ ] 上电默认休眠，长按唤醒
 
 ## 参考代码对照
 
