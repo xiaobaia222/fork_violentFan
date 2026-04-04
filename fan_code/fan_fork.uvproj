@@ -411,6 +411,11 @@
               <FileType>1</FileType>
               <FilePath>.\src\key.c</FilePath>
             </File>
+            <File>
+              <FileName>adc_bat.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\adc_bat.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

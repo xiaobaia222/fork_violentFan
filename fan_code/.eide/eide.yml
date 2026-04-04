@@ -19,6 +19,7 @@ virtualFolder:
         - path: src/led.c
         - path: src/common.c
         - path: src/key.c
+        - path: src/adc_bat.c
       folders: []
 dependenceList: []
 outDir: build

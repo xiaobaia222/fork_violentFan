@@ -54,8 +54,9 @@ static void gpio_init(void)
     P1M1 &= ~0x3F;
     P1 &= ~0x3F;
 
-    P3M0 &= ~0x7C;
-    P3M1 |= 0x7C;
+    /* P3.0 VBUS_SENSE 高阻输入; P3.2~P3.6 ADC/比较器高阻 */
+    P3M0 &= ~0x7D;
+    P3M1 |= 0x7D;
 
     POWER_SWITCH = 1;
 }

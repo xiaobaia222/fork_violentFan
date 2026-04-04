@@ -34,6 +34,9 @@ sfr     VRTRIM  =   0xa6;
 #define STA_BATLOW          0x08
 #define STA_CHARGING        0x10
 
+/* 充电线检测: 0=接入, 1=断开 */
+#define VBUS_SENSE          P30
+
 typedef struct {
     unsigned char bit0 : 1;
     unsigned char bit1 : 1;

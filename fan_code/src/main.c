@@ -3,13 +3,14 @@
 #include "..\inc\led.h"
 #include "..\inc\key.h"
 #include "..\inc\motor.h"
+#include "..\inc\adc_bat.h"
 #include "intrins.h"
 
 /* ======== 全局状态 ======== */
 bit B_start = 0;
 unsigned char throttle_index = 0;
 unsigned int motor_time = 0;
-unsigned char status = 0;
+unsigned char status = STA_SLEEP;   /* 上电默认休眠，由长按唤醒 */
 static bit tick_10ms = 0;
 static unsigned char pwm_value = 0;
 
@@ -32,7 +33,12 @@ void bat_low_beebee(void)
 void main()
 {
     init();
-    status = STA_RUNNING;
+
+    /* 上电绿灯闪 2 次，表明 MCU 正常启动，然后进入休眠等待长按 */
+    led_g_on();  delay_ms(150);
+    led_g_off(); delay_ms(100);
+    led_g_on();  delay_ms(150);
+    led_g_off();
 
     while (1)
     {
@@ -41,6 +47,85 @@ void main()
         if (!tick_10ms)
             continue;
         tick_10ms = 0;
+
+        /* ========= 唤醒/充电状态处理 ========= */
+        if (status & STA_WAKING)
+        {
+            /* 退出唤醒标志，一次性处理 */
+            status &= ~STA_WAKING;
+
+            if (VBUS_SENSE == 0)        /* 插着充电线，进入充电休眠 */
+            {
+                motor_stop();
+                throttle_index = 0;
+                POWER_SWITCH = 0;
+                status |= STA_CHARGING;
+                status |= STA_SLEEP;
+            }
+            else                        /* 未在充电，正常唤醒进入运行 */
+            {
+                POWER_SWITCH = 1;
+                status &= ~STA_SLEEP;
+                status &= ~STA_CHARGING;
+                status |= STA_RUNNING;
+                led_all_off();
+                led_r_on();             /* 红灯亮起表示唤醒成功，等待短按切档 */
+            }
+        }
+
+        /* 运行过程中插入充电线：模拟 INT4 中断行为，立即停机并休眠充电 */
+        if ((status & STA_RUNNING) && (VBUS_SENSE == 0))
+        {
+            motor_stop();
+            throttle_index = 0;
+            POWER_SWITCH = 0;
+            status &= ~STA_RUNNING;
+            status |= STA_CHARGING;
+            status |= STA_SLEEP;
+        }
+
+        /* ========= 电池电压检测 + 低压标志 ========= */
+        bat_update_10ms();
+        if (bat_is_low())
+            status |= STA_BATLOW;
+        else
+            status &= ~STA_BATLOW;
+
+        /* 低压运行保护: 停机, 蓝灯闪烁提示 ~2 秒, 然后休眠 */
+        if ((status & STA_BATLOW) && (status & STA_RUNNING))
+        {
+            unsigned char blink;
+            motor_stop();
+            throttle_index = 0;
+            bat_low_beebee();
+            for (blink = 0; blink < 4; blink++)
+            {
+                led_all_off();
+                led_b_on();
+                delay_ms(250);
+                led_all_off();
+                delay_ms(250);
+            }
+            status &= ~STA_RUNNING;
+            status |= STA_SLEEP;
+        }
+
+        /* ========= 休眠状态：关闭驱动并进入空闲低功耗 ========= */
+        if (status & STA_SLEEP)
+        {
+            if (B_run || B_start)
+            {
+                motor_stop();
+                B_start = 0;
+            }
+            throttle_index = 0;
+            led_all_off();
+            POWER_SWITCH = 0;
+
+            /* MCU 进入 IDL 模式，任意中断唤醒 (Timer2/按键) */
+            PCON |= 0x01;
+            continue;
+        }
 
         if (!(status & STA_RUNNING))
             continue;
@@ -87,9 +172,11 @@ void main()
         }
         else if (B_start)
         {
-            B_start = 0;
+            /* 注意: 不能在 motor_start() 之前清零 B_start。
+             * motor_step() 依赖 B_start==1 来压制比较器中断，
+             * 确保开环强制换相阶段不被 BEMF ISR 干扰。 */
             motor_start();
-            B_start = 0;
+            B_start = 0;    /* 开环结束后才清零，允许闭环比较器检测 */
             motor_enter_run();
             delay_ms(250);
             delay_ms(250);
@@ -123,6 +210,10 @@ void key_handle(void)
     switch (evt)
     {
     case KEY_EVT_SHORT:
+        /* 休眠/唤醒状态下的短按：不做任何操作，避免误触 */
+        if (status & (STA_SLEEP | STA_WAKING))
+            break;
+
         if (status & STA_BATLOW)
         {
             bat_low_beebee();
@@ -140,13 +231,27 @@ void key_handle(void)
         break;
 
     case KEY_EVT_LONG:
-        motor_stop();
-        throttle_index = 0;
-        status &= ~STA_RUNNING;
-        status |= STA_SLEEP;
+        if (status & STA_SLEEP)
+        {
+            /* 休眠时长按：进入唤醒流程，在主循环中根据 VBUS_SENSE 决定充电或运行 */
+            status |= STA_WAKING;
+        }
+        else
+        {
+            /* 运行/充电时长按：关机休眠 */
+            motor_stop();
+            throttle_index = 0;
+            status &= ~STA_RUNNING;
+            status |= STA_SLEEP;
+        }
         break;
 
     case KEY_EVT_DOUBLE:
+        if (status & STA_SLEEP)
+        {
+            /* 休眠时双击忽略 */
+            break;
+        }
         motor_stop();
         throttle_index = 0;
         break;
@@ -163,9 +268,10 @@ void led_show_throttle(void)
     led_all_off();
     switch (throttle_index)
     {
-        case 1: led_r_on(); break;
-        case 2: led_g_on(); break;
-        case 3: led_b_on(); break;
+        case 0: led_r_on(); break;      /* 待机: 红灯常亮 */
+        case 1: led_g_on(); break;      /* 1档: 绿 */
+        case 2: led_b_on(); break;      /* 2档: 蓝 */
+        case 3: led_r_on(); led_g_on(); led_b_on(); break;  /* 3档: 全亮白 */
         default: break;
     }
 }
@@ -177,8 +283,13 @@ void init(void)
     key_init();
     motor_init();
     timer2_init();
+    bat_init();
     P_SW2 |= 0x80;     /* 保持 xdata SFR 访问使能，运行时 PWMA 寄存器需要 */
     EA = 1;
+
+    /* 上电默认休眠，立即关闭 MOS 驱动电源 */
+    if (status & STA_SLEEP)
+        POWER_SWITCH = 0;
 }
 
 void clk_init(void)
@@ -204,6 +315,7 @@ void timer2_init(void)
 
 void TM2_Isr(void) interrupt 12
 {
+    WDT_CONTR |= 0x10;     /* 喂狗，防止看门狗复位 */
     tick_10ms = 1;
     key_scan();
 }
