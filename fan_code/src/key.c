@@ -39,7 +39,8 @@ void key_init(void)
     P3 |= 0x80;
 
     P_SW2 |= 0x80;
-    P3PU |= 0x80;
+    P3PU |= 0x80;   /* P3.7 按键上拉 */
+    P3PU |= 0x01;   /* P3.0 VBUS_SENSE 上拉，防悬空误判充电接入 */
     P_SW2 &= ~0x80;
 
     state = ST_IDLE;

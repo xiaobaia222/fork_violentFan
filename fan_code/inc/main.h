@@ -27,12 +27,8 @@
 // sfr     IRTRIM  =   0x9f;
 sfr     VRTRIM  =   0xa6;
 
-/* 系统状态位 */
-#define STA_SLEEP           0x01
-#define STA_WAKING          0x02
-#define STA_RUNNING         0x04
-#define STA_BATLOW          0x08
-#define STA_CHARGING        0x10
+/* 系统主状态（互斥枚举，在 main.c 中 typedef） */
+/* STA_* 宏已移除，改用 state_t 枚举 */
 
 /* 充电线检测: 0=接入, 1=断开 */
 #define VBUS_SENSE          P30
