@@ -147,6 +147,14 @@ void main(void)
                     sleep_key_cnt = 0;
                     if (VBUS_SENSE != 0)    /* 无充电线，允许开机 */
                     {
+                        /* 等待用户松手，避免进入运行模式后 key_handle()
+                         * 再次检测到长按而立即关机 */
+                        while (KEY_PIN == 0)
+                        {
+                            PCON |= 0x02;
+                            _nop_(); _nop_();
+                            WDT_CONTR |= 0x10;
+                        }
                         is_sleeping = 0;
                         sleep_exit();
                         POWER_SWITCH = 1;
