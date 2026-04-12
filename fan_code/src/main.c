@@ -78,29 +78,35 @@ static void sleep_enter(void)
  * ====================================================== */
 static void sleep_exit(void)
 {
+    P_SW2    |= 0x80;
     /* 关闭掉电唤醒定时器 */
     WKTCH = 0x00;
-
+    /* 重置按键状态机（清除睡眠期间残留状态） */
+    key_init();
     /* 重启 Timer2（主节拍 10ms） */
     timer2_init();
+    motor_init();
+    bat_init();
 
+    // init();
+    // IE2  &= 0x04; 
+    // AUXR &= 0x10;          /* T2R = 0：停止计数 */
+    // ET1 = 1;
+    // ET1 = 1;
+    // EA = 1;
     /* 重新初始化 ADC（BEMF 比较器正输入，通道 13） */
     ADC_CONTR = 0x80 | 13;
     ADCCFG    = 0x21;
-    P_SW2    |= 0x80;
+    
     ADCTIM    = 0x20 + 20;
 
-    /* 重新初始化比较器 */
-    CMPCR1 = 0x8C;
-    CMPCR2 = 60;
+    // /* 重新初始化比较器 */
+    // CMPCR1 = 0x8C;
+    // CMPCR2 = 60;
+    // // ADC_CONTR |= 0x80;
 
-    IE2  &= 0x04; 
-    AUXR &= 0x10;          /* T2R = 0：停止计数 */
-    ET1 = 1;
-    ET1 = 1;
-    EA = 1;
-    /* 重置按键状态机（清除睡眠期间残留状态） */
-    key_init();
+    
+
 }
 
 /* ======================================================
@@ -153,7 +159,6 @@ void main(void)
                     sleep_key_cnt = 0;
                     if (VBUS_SENSE != 0)    /* 无充电线，允许开机 */
                     {
-                        led_g_on();
                         is_sleeping = 0;
                         sleep_exit();
                         POWER_SWITCH = 1;
