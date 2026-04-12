@@ -15,7 +15,7 @@
  */
 
 /* 10 位 ADC, Vref≈VCC, 6.4V≈3.76V → 3.76/5*1023≈770 */
-#define BAT_ADC_LOW      770u
+#define BAT_ADC_LOW      760u
 
 void        bat_init(void);
 void        bat_update_10ms(void);       /* 在 10ms tick 中调用 */

@@ -34,6 +34,8 @@ targets:
         - inc
       libList: []
     excludeList: []
+    settings:
+      debugger: unknown
     toolchain: Keil_C51
     toolchainConfigMap:
       Keil_C51:

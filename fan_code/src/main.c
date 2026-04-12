@@ -18,7 +18,7 @@ bit B_start = 0;
 unsigned char throttle_index = 0;
 unsigned int  motor_time     = 0;
 
-static state_t       state         = STATE_SLEEP;
+static state_t       state         = STATE_RUNNING;
 static bit           tick_10ms     = 0;
 static unsigned char data pwm_value  = 0;
 static unsigned char data last_pwm   = 0;
@@ -65,8 +65,8 @@ static void sleep_enter(void)
     /* 配置掉电唤醒定时器，约 100ms
      * 振荡器 32KHz，周期 = (N+1) / 32000
      * N = 3199 = 0x0C7F → 3200 / 32000 = 100ms */
-    WKTCL = 0x7F;
-    WKTCH = 0x8C;           /* WKTEN=1 | 高4位 = 0x0C */
+    WKTCL = 0xc6;
+    WKTCH = 0x80;           /* WKTEN=1 | 高4位 = 0x0C */
 
     /* WDT 最大预分频（PS=7，约 22.5ms @35MHz）
      * 掉电期间 WDT 暂停，WKTR 每 100ms 唤醒后及时喂狗 */
@@ -94,6 +94,11 @@ static void sleep_exit(void)
     CMPCR1 = 0x8C;
     CMPCR2 = 60;
 
+    IE2  &= 0x04; 
+    AUXR &= 0x10;          /* T2R = 0：停止计数 */
+    ET1 = 1;
+    ET1 = 1;
+    EA = 1;
     /* 重置按键状态机（清除睡眠期间残留状态） */
     key_init();
 }
@@ -142,11 +147,13 @@ void main(void)
             /* ② 长按检测：10 次 × 100ms = 1s */
             if (KEY_PIN == 0)
             {
+                led_b_on();
                 if (++sleep_key_cnt >= 10)
                 {
                     sleep_key_cnt = 0;
                     if (VBUS_SENSE != 0)    /* 无充电线，允许开机 */
                     {
+                        led_g_on();
                         is_sleeping = 0;
                         sleep_exit();
                         POWER_SWITCH = 1;
@@ -162,6 +169,7 @@ void main(void)
             else
             {
                 sleep_key_cnt = 0;
+                led_b_off();
             }
 
             /* ③ 充电线插拔检测 */

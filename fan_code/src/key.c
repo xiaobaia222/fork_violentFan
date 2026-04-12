@@ -82,7 +82,7 @@ void key_scan(void)
         {
             if (++cnt >= KEY_LONG_CNT)
             {
-                event = KEY_EVT_LONG;
+                
                 state = ST_WAIT_REL;
             }
         }
@@ -125,8 +125,11 @@ void key_scan(void)
         break;
 
     case ST_WAIT_REL:
-        if (!pressed)
+        if (!pressed){
+            event = KEY_EVT_LONG;
             state = ST_IDLE;
+        }
+            
         break;
 
     default:
