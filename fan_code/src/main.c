@@ -14,6 +14,9 @@ typedef enum {
 } state_t;
 
 /* ======== 全局变量 ======== */
+// typedef sturct {
+
+// };
 bit B_start = 0;
 unsigned char throttle_index = 0;
 unsigned int  motor_time     = 0;
@@ -29,7 +32,7 @@ static unsigned char data sleep_key_cnt = 0; /* 睡眠中长按计数（×100ms�
 static unsigned char data chg_blink_cnt = 0; /* 充电 LED 闪烁计数 */
 
 /* 自动关机阈值 */
-#define MOTOR_RUNTIME_TH    30000   /* 运行时 5min  */
+#define MOTOR_RUNTIME_TH    3000000   /* 运行时 5min  */
 #define MOTOR_IDLETIME_TH   3000    /* 空档时 30s   */
 
 /* 前向声明 */

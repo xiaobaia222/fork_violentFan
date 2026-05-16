@@ -7,7 +7,7 @@
 
 /* 时间参数，单位：扫描周期（10ms） */
 #define KEY_DEBOUNCE_CNT    3       // 30ms 消抖
-#define KEY_LONG_CNT        100     // 1s 长按
+#define KEY_LONG_CNT        300     // 3s 长按
 #define KEY_DOUBLE_GAP      25      // 250ms 双击窗口
 
 /* 按键事件 */

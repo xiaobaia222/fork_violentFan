@@ -29,7 +29,7 @@
 #define ST_WAIT_REL     5
 
 static unsigned char data state = ST_IDLE;
-static unsigned char data cnt   = 0;
+static unsigned short data cnt   = 0;
 static unsigned char data event = KEY_EVT_NONE;
 
 void key_init(void)
@@ -82,7 +82,7 @@ void key_scan(void)
         {
             if (++cnt >= KEY_LONG_CNT)
             {
-                
+                event = KEY_EVT_LONG;
                 state = ST_WAIT_REL;
             }
         }
@@ -126,7 +126,8 @@ void key_scan(void)
 
     case ST_WAIT_REL:
         if (!pressed){
-            event = KEY_EVT_LONG;
+            
+            
             state = ST_IDLE;
         }
             
