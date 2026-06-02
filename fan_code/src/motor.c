@@ -13,7 +13,7 @@ sbit PWM_CH = P1^4;
 sbit PWM_CL = P1^5;
 
 /* ======== 油门表 ======== */
-unsigned char code THROTTLE[THROTTLE_SUM] = {0, 50, 80, 150};
+unsigned char code THROTTLE[THROTTLE_SUM] = {0, 65, 80, 100};
 
 /* ======== 运行变量 ======== */
 bit B_run = 0;

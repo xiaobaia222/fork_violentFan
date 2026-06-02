@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "WebFetch(domain:em-ide.com)",
+      "WebSearch",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(curl -sL --max-time 20 \"https://raw.githubusercontent.com/github0null/eide/master/src/HexUploader.ts\")",
+      "Bash(rm -f /tmp/hu.ts)",
+      "Bash(curl -sL --max-time 30 \"https://raw.githubusercontent.com/github0null/eide/master/src/HexUploader.ts\")",
+      "Bash(curl -sL --max-time 20 \"https://raw.githubusercontent.com/github0null/eide-docs/master/docs/zh-cn/flasher/stcgal.md\")",
+      "Bash(curl -sL --max-time 20 \"https://raw.githubusercontent.com/github0null/eide-docs/master/docs/en/flasher/stcgal.md\")",
+      "Bash(curl -sL --max-time 20 \"https://api.github.com/repos/github0null/eide-docs/contents/docs\")",
+      "Bash(where python *)",
+      "Bash(where stcgal *)"
     ]
   }
 }

@@ -1,0 +1,5 @@
+{
+  "device": "stc8g",
+  "port": "com6",
+  "baudrate": "115200"
+}

@@ -57,6 +57,6 @@ targets:
     uploadConfigMap:
       Custom:
         bin: ""
-        commandLine: ""
+        commandLine: stcgal -P stc8g -p COM6 -b 115200 -t 33000 "${programFile}"
         eraseChipCommand: ""
     uploader: Custom
